@@ -1,0 +1,75 @@
+REF 1
+- Prob. of being Asymptomatic: 35% (but there is some disagreance)
+    - Transmission rate is same as when they show symptoms
+    - https://health.ucdavis.edu/coronavirus/resources/covid-19-faqs-for-health-professionals.html
+
+REF 2
+- Low prob of infection from surfaces (dont know exact number, germs can last up to 3 days on hard surfaces)
+    - https://www.nytimes.com/2020/05/28/well/live/whats-the-risk-of-catching-coronavirus-from-a-surface.html
+
+REF 3
+Infection -> Incubation -> Symptoms
+0           lasts 4 to 6 days    lasts 10 days
+0                                Lasts 8 to 10 days, starts 1 to 3 days before symptoms show
+Infection -> Latent period -> Infectious Period                              ->                 Removed
+- https://theconversation.com/how-long-are-you-infectious-when-you-have-coronavirus-135295  (April 12)
+
+REF 4
+Incubation period
+- For young adults: 7.6
+- Median: 8.3
+- Old (>= 65): 11.2
+- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7280705/ (May 22)
+
+REF 5
+- Incubation: 4-5 days
+- https://www.cdc.gov/coronavirus/2019-ncov/hcp/clinical-guidance-management-patients.html
+
+REF 6
+- FPR is very small for COVID test
+- FNR is higher
+"The researchers estimated that those tested with SARS-CoV-2 in the four days after infection were 67% more likely to
+test negative, even if they had the virus. When the average patient began displaying symptoms of the virus, the
+false-negative rate was 38%. The test performed best eight days after infection (on average, three days after symptom
+onset), but even then had a false negative rate of 20%, meaning one in five people who had the virus had a negative
+test result."
+- https://www.sciencedaily.com/releases/2020/06/200610094112.htm (June 10)
+
+REF 7
+- Generally people dont seem to be infectious after getting it and recovering (at least in short term)
+- https://www.cdc.gov/coronavirus/2019-ncov/hcp/faq.html
+
+REF 8
+- Severity
+    - Mild to moderate: 81%
+    - Severe: 14%
+    - Critical: 5%
+        - All deaths happen here with an overall case fatality rate of 2.3% (49% of those in critical condition)
+    - For children: 94% mild-mod, 5% severe, <1% critical
+    - "Age is a strong risk factor for severe illness, complications, and death. Among >44,000
+    confirmed cases of COVID-19 in China, the case fatality rate was highest among older persons: ≥80 years, 14.8%;
+    70–79 years, 8.0%; 60–69 years, 3.6%; 50–59 years, 1.3%; 40–49 years, 0.4%; <40 years, 0.2%."
+    - https://www.cdc.gov/coronavirus/2019-ncov/hcp/clinical-guidance-management-patients.html
+
+REF 9
+- Hospitalization rates
+    - 98.4 / 100,000 (avg)
+    - age >= 65: 297.6 / 100,000
+    - 50-64 years: 148.6 / 100,000
+    - 0-17 yearsL Much much lower
+    - https://www.cdc.gov/coronavirus/2019-ncov/covid-data/covidview/index.html
+
+
+- Infection prob does not change based on age (only the severity)
+- No number for infection prob found
+- No number for infection protection found for masks
+    - Generally masks dont lower your chance of infection but it does lower the chance of people around you getting it
+    if you are infected
+- No number for infection protection found for social distancing
+    - It helps lower infection prob for you and others (if you are infected)
+
+REF 10
+- R0 is about 2-2.5 (https://www.businessinsider.com/coronavirus-contagious-r-naught-average-patient-spread-2020-3)
+
+REF 11
+- R0 of 5.7 (newer) (https://wwwnc.cdc.gov/eid/article/26/7/20-0282_article)
