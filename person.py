@@ -120,25 +120,19 @@ class Person:
         self.infection_step += 1
         new_infection_stage = False
         new_symptoms_stage = False
-        # print('Infection step: {}'.format(self.infection_step))
-        # print('infection phase: {}'.format(self.current_infection_stage))
-        # print('symptoms phase: {}'.format(self.current_symptom_stage))
         # If gets to new stage then pop off first
         if self.infection_step == self.infectious_periods[0][1]:
             self.current_infection_stage = self.infectious_periods[0][0]
             self.infectious_periods.pop(0)
             new_infection_stage = True
-            # print('infection: {}'.format(self.infectious_periods))
 
         if self.infection_step == self.symptoms_periods[0][1]:
             self.current_symptom_stage = self.symptoms_periods[0][0]
             self.symptoms_periods.pop(0)
             new_symptoms_stage = True
-            # print('symptoms: {}'.format(self.symptoms_periods))
 
         # If dead then return true
         if self.current_symptom_stage == 'death':
-            # print('DEATH')
             return True, None
 
         new_SD = None
@@ -148,7 +142,6 @@ class Person:
             self.wear_mask = True
             new_SD = True if not self.social_distance else None
             self.social_distance = True
-            # print('Hit mild and altruitsic and new SD: {}'.format(new_SD))
         elif self.current_symptom_stage == 'severe' and new_symptoms_stage:
             # Severe means SD and WM and NO non-defensive movement
             # todo: Might turn off ALL movement at this stage
@@ -171,7 +164,7 @@ class Person:
 
     # Check if person is infected given the number of infected (and in infectious phase) people
     # in its immediate neighborhood
-    def gets_infected(self, num_infectious_neighbors, base_infection_prob, mask_infection_prob_decrease):
+    def gets_infected(self, num_infectious_neighbors, base_infection_prob, mask_infection_prob_decrease, data_collector):
         # Skip if already infected or recovered
         if self.infected or self.recovered:
             return
@@ -180,9 +173,13 @@ class Person:
         p = base_infection_prob + -1. * (self.wear_mask * mask_infection_prob_decrease)
         r = num_infectious_neighbors
         I_prob = 1 - (1 - p) ** r
+
         if np.random.random() < I_prob:
             self.infected = True
+            self.susceptible = False
             self.current_symptom_stage = self.symptoms_periods[0][0]
             self.current_infection_stage = self.infectious_periods[0][0]
             self.infectious_periods.pop(0)
             self.symptoms_periods.pop(0)
+            self.infection_step = 0
+            data_collector.increment_total_infected()

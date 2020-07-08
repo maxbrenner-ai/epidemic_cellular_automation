@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/epidemic_cellular_automation.iml" filepath="$PROJECT_DIR$/.idea/epidemic_cellular_automation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../evolving-cellular-automata-genetic-algorithm-population-dynamics/.idea/evolving-CA-GA.iml" filepath="$PROJECT_DIR$/../evolving-cellular-automata-genetic-algorithm-population-dynamics/.idea/evolving-CA-GA.iml" />
     </modules>
   </component>
 </project>
