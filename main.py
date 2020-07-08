@@ -109,13 +109,15 @@ class CellularAutomation:
         return self.grid[position[1], position[0]] is None
 
     def _kill_person(self, id, social_distance):
+        person = self.id_person[id]
         if social_distance: self.ids_social_distance.remove(id)
         else: self.ids_not_social_distance.remove(id)
-        position = self.id_person[id].position
+        position = person.position
         self._clear_cell(position)
-        assert self.id_person[id].infected
-        del self.id_person[id]
+        assert person.infected
         self.data_collect.increment_death_data()
+        self.data_collect.add_lifetime_infected(person.num_people_infected)
+        del self.id_person[id]
 
     def _clear_cell(self, position):
         self.grid[position[1], position[0]] = None
@@ -205,7 +207,7 @@ class CellularAutomation:
     def _check_neighbors_SD(self, id, person):
         def check_neighbors(last_position=None):
             safe_cells = {(-1, -1): None, (0, -1): None, (1, -1): None, (-1, 0): None, (1, 0): None, (-1, 1): None, (0, 1): None, (1, 1): None}
-            num_infected = 0
+            infected_neighbors = []
             for neighbor, neighbor_pos, neighbor_pos_rel in self._yield_neighbors(person.position, 3):
                 if neighbor_pos == person.position:
                     continue
@@ -213,15 +215,15 @@ class CellularAutomation:
                 safe_cells[neighbor_pos_rel] = neighbor_pos
                 # Add to infected if infectious neighbor
                 if neighbor and neighbor.is_infectious():
-                    num_infected += 1
+                    infected_neighbors.append(neighbor)
                 # Remove from safe cell if cell contains a person or it was the last pos
                 if neighbor or last_position == neighbor_pos:
                     del safe_cells[neighbor_pos_rel]
-            return num_infected, safe_cells
+            return infected_neighbors, safe_cells
         # First get number of infected around this and check if it gets infected
-        num_infected, safe_cells = check_neighbors()
+        infected_neighbors, safe_cells = check_neighbors()
         # Check if infected
-        person.gets_infected(num_infected, base_infection_prob, mask_infection_prob_decrease, self.data_collect)
+        self._check_infection(person, infected_neighbors)
         # Then Moving
         # Move it if its own cell is not safe OR its moving intenionally
         if len(safe_cells) < 8 or np.random.random() < person.movement_prob:
@@ -242,34 +244,33 @@ class CellularAutomation:
                     # First one that is safe: move there
                     if safe:
                         self._move_person(id, person, safe_cell_abs_pos)
-                        num_infected, safe_cells = check_neighbors(last_position)
-                        person.gets_infected(num_infected, base_infection_prob, mask_infection_prob_decrease, self.data_collect)
+                        infected_neighbors, safe_cells = check_neighbors(last_position)
+                        self._check_infection(person, infected_neighbors)
                         did_move = True
                         break
                 # End if it did not move
                 if not did_move:
                     break
-        return person.position, num_infected
 
     # If not SD then move if moving intentionally
     def _check_neighbors_not_SD(self, id, person):
         def check_neighbors(last_position=None):
             empty_spots = []
-            num_infected = 0
+            infected_neighbors = []
             for neighbor, neighbor_pos, _ in self._yield_neighbors(person.position, 3):
                 if neighbor_pos == person.position:
                     continue
                 # Add to infected if infectious neighbor
                 if neighbor and neighbor.is_infectious():
-                    num_infected += 1
+                    infected_neighbors.append(neighbor)
                 # Add empty spot (also if not the last position the person was at if moving more than once)
                 if not neighbor and neighbor_pos != last_position:
                     empty_spots.append(neighbor_pos)
-            return num_infected, empty_spots
+            return infected_neighbors, empty_spots
         # First get number of infected around this and check if it gets infected
-        num_infected, empty_spots = check_neighbors()
+        infected_neighbors, empty_spots = check_neighbors()
         # Check if infected
-        person.gets_infected(num_infected, base_infection_prob, mask_infection_prob_decrease, self.data_collect)
+        self._check_infection(person, infected_neighbors)
         # Then Moving
         if np.random.random() < person.movement_prob:
             for m in range(move_length):
@@ -278,15 +279,23 @@ class CellularAutomation:
                     new_spot = random.choice(empty_spots)
                     last_position = person.position
                     self._move_person(id, person, new_spot)
-                    num_infected, empty_spots = check_neighbors(last_position)
-                    person.gets_infected(num_infected, base_infection_prob, mask_infection_prob_decrease, self.data_collect)
+                    infected_neighbors, empty_spots = check_neighbors(last_position)
+                    self._check_infection(person, infected_neighbors)
                 else:
                     break
+
+    def _check_infection(self, person, infected_neighbors):
+        newly_infected = person.gets_infected(len(infected_neighbors), base_infection_prob, mask_infection_prob_decrease,
+                                              self.data_collect)
+        # If this person was just infected then add to the num of people infected to each neighbor for calc. Ro
+        if newly_infected:
+            for person in infected_neighbors:
+                person.num_people_infected += 1
 
     def _update_person(self, id):
         person = self.id_person[id]
         # Progress Infection (if infected)
-        dead, new_SD = person.progress_infection()
+        dead, new_SD = person.progress_infection(self.data_collect)
         if dead:
             self._kill_person(id, person.social_distance)
             return None # Continue to next person
@@ -357,6 +366,6 @@ class CellularAutomation:
         self.data_collect.reset(t+1, last=True)
 
 data_collect = DataCollector()
-data_collect.set_print_options(to_print=['S', 'I', 'R', 'death'])
+data_collect.set_print_options(basic_to_print=['S', 'I', 'R', 'death'])
 CA = CellularAutomation(data_collect)
 CA.run(render=False)

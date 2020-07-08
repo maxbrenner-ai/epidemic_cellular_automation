@@ -38,6 +38,8 @@ class Person:
         # But scientists are still not sure
         self.recovered = False
         self.infection_step = -1
+        # Keeps track of num of people that this person has infected (or contributed to the infection of)
+        self.num_people_infected = 0
 
         # CREATE INFECTION PERIODS -----
         incubation_period_duration = np.random.randint(incubation_period_duration_range[0],
@@ -114,7 +116,7 @@ class Person:
     def is_infectious(self):
         return self.current_infection_stage == 'infectious'
 
-    def progress_infection(self):
+    def progress_infection(self, data_collector):
         if not self.infected:
             return False, None
         self.infection_step += 1
@@ -159,6 +161,7 @@ class Person:
             new_SD = self.social_distance_before_symptoms if self.social_distance != self.social_distance_before_symptoms else None
             self.social_distance = self.social_distance_before_symptoms
             self.movement_prob = self.movement_prob_before_symptoms
+            data_collector.add_lifetime_infected(self.num_people_infected)
 
         return False, new_SD
 
@@ -167,7 +170,7 @@ class Person:
     def gets_infected(self, num_infectious_neighbors, base_infection_prob, mask_infection_prob_decrease, data_collector):
         # Skip if already infected or recovered
         if self.infected or self.recovered:
-            return
+            return False
         # Use Kermack-McKendrick Model of infection probability
         # 1 - (1 - p) ^ r; p -> infection prob of one person; r -> number of infectious people
         p = base_infection_prob + -1. * (self.wear_mask * mask_infection_prob_decrease)
@@ -183,3 +186,5 @@ class Person:
             self.symptoms_periods.pop(0)
             self.infection_step = 0
             data_collector.increment_total_infected()
+            return True
+        return False
