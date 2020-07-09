@@ -40,6 +40,8 @@ class Person:
         self.infection_step = -1
         # Keeps track of num of people that this person has infected (or contributed to the infection of)
         self.num_people_infected = 0
+        # Also for R0 keep track of number of days during infectious phase they were SD and WM
+        self.infectious_days_info = {'SD': 0, 'not SD': 0, 'WM': 0, 'not WM': 0}
 
         # CREATE INFECTION PERIODS -----
         incubation_period_duration = np.random.randint(incubation_period_duration_range[0],
@@ -119,6 +121,11 @@ class Person:
     def progress_infection(self, data_collector):
         if not self.infected:
             return False, None
+        if self.is_infectious():
+            if self.social_distance: self.infectious_days_info['SD'] += 1
+            else: self.infectious_days_info['not SD'] += 1
+            if self.wear_mask: self.infectious_days_info['WM'] += 1
+            else: self.infectious_days_info['not WM'] += 1
         self.infection_step += 1
         new_infection_stage = False
         new_symptoms_stage = False
@@ -161,20 +168,21 @@ class Person:
             new_SD = self.social_distance_before_symptoms if self.social_distance != self.social_distance_before_symptoms else None
             self.social_distance = self.social_distance_before_symptoms
             self.movement_prob = self.movement_prob_before_symptoms
-            data_collector.add_lifetime_infected(self.num_people_infected)
+            data_collector.add_lifetime_infected(self.num_people_infected, self.infectious_days_info)
 
         return False, new_SD
 
     # Check if person is infected given the number of infected (and in infectious phase) people
     # in its immediate neighborhood
-    def gets_infected(self, num_infectious_neighbors, base_infection_prob, mask_infection_prob_decrease, data_collector):
+    def gets_infected(self, infectious_neighbors, base_infection_prob, mask_infection_prob_decrease, data_collector):
         # Skip if already infected or recovered
-        if self.infected or self.recovered:
+        if self.infected or self.recovered or len(infectious_neighbors) == 0:
             return False
         # Use Kermack-McKendrick Model of infection probability
         # 1 - (1 - p) ^ r; p -> infection prob of one person; r -> number of infectious people
-        p = base_infection_prob + -1. * (self.wear_mask * mask_infection_prob_decrease)
-        r = num_infectious_neighbors
+        p = [base_infection_prob + (-1. * (neighbor.wear_mask * mask_infection_prob_decrease)) for neighbor in infectious_neighbors]
+        p = sum(p) / len(p)
+        r = len(infectious_neighbors)
         I_prob = 1 - (1 - p) ** r
 
         if np.random.random() < I_prob:

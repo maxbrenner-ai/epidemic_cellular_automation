@@ -3,69 +3,31 @@ import random
 from person import Person
 import pygame
 from data_collector import DataCollector
+import json
 
 # np.random.seed(42)
 
-# Grid
-grid_width = 75
-grid_height = 75
-initial_pop_size = 500
-number_iterations = 50
-
-# Render
-cell_size = 8
-screen_height = grid_height * cell_size
-screen_width = grid_width * cell_size
 color_models = {'SIR': {'susceptible': (204, 255, 204), 'infected': (255, 204, 204), 'recovered': (204, 204, 255)}}
-current_color_model = 'SIR'
-fps = 3
-
-# Person Initial Attributes
-age_range = [10, 80]  # Range
-movement_prob = {'low': 0.25, 'high': 0.75}  # Choices (prob. of moving that step)
-move_length = 6  # Number of cells to move in a single step
-initial_infection_prob = 0.05  # ie on avg X% of people will start out infected
-altruistic_prob = 0.75  # Prob that someone who has symptoms will wear a mask and social distance
-
-# Person Disease Attributes
-# Prob. that an infected person (right next to) will infect a susceptible person
-base_infection_prob = 0.5  # Not based on any stats
-# This is how much the base_infection_prob is lowered if the infected individual is wearing a mask
-mask_infection_prob_decrease = 0.05  # Not based on any stats
-# Total length of infection in days
-total_length_infection = 14  # REF 3
-# Length range of the incubation period
-incubation_period_duration_range = [4, 6]  # REF 3
-# Length range of infectious period
-infectious_period_duration_range = [8, 9]  # REF 3
-# How many days before symptoms show (or would show if asymptomatic) would infectious start
-infectious_start_before_symptoms_range = [2, 3]  # REF 3
+shape_models = {'SD': {True: 'circle', False: 'rect'},
+                'WM': {True: 'circle', False: 'rect'}}
 # Starting at each age given (keys): values are the prob for severe (o.w. mild)
-severity_by_age = [(10, 0.05), (20, 0.1), (40, 0.2), (60, 0.4)]  # Based off of REF 8 (but I had to make up some things)
-
-severity_prob = 0.25
-
-# How long after showing symptoms would severe symptoms (if they are gonna show up) start
-severe_symptoms_start_range = [2, 4]  # todo: GET REAL DATA FOR THIS
-# How long after showing severe symptoms does death usually occur
-death_occurrence_range = [2, 4]  # todo: GET REAL DATA FOR THIS
-asymptomatic_prob = 0.33  # REF 1 (0.35)
+# severity_by_age = [(10, 0.05), (20, 0.1), (40, 0.2), (60, 0.4)]  # Based off of REF 8 (but I had to make up some things)
 # The prob of death GIVEN severe symptoms (by age in the same way as severity by age)
 # Since dying is a subset of severe (only people who had severe symptoms died) then its just fatality (given by REF 8)
 # divided by severity by age (which I made up but is still based off of REF 8)
-case_fatality_rate_by_age_given_severe_symptoms = [(10, 0.04), (20, 0.02), (40, 0.02), (50, 0.065), (60, 0.2), (70, 0.37)]
-
-death_prob = 0.25
-
+# case_fatality_rate_by_age_given_severe_symptoms = [(10, 0.04), (20, 0.02), (40, 0.02), (50, 0.065), (60, 0.2), (70, 0.37)]
 policies_safety = {
     'high': {'social_distance_prob': 0.75, 'wear_mask_prob': 0.75, 'low_movement_prob': 0.75},
     'medium': {'social_distance_prob': 0.5, 'wear_mask_prob': 0.5, 'low_movement_prob': 0.5},
     'low': {'social_distance_prob': 0.25, 'wear_mask_prob': 0.25, 'low_movement_prob': 0.25},
 }
-policy_type = 'low'
 
 class CellularAutomation:
-    def __init__(self, data_collect):
+    def __init__(self, constants, data_collect):
+        self.grid_C = constants['grid']
+        self.render_C = constants['render']
+        self.person_C = constants['person']
+        self.disease_C = constants['disease']
         self.data_collect = data_collect
         # Need two sets of ids (correspond uniquely to a person)
         # 1) Those who practice social distancing
@@ -75,19 +37,19 @@ class CellularAutomation:
         # The person objects
         # id (int): person (object)
         self.id_person = {}
-        self.grid = np.empty(shape=(grid_height, grid_width), dtype=np.object)
+        self.grid = np.empty(shape=(self.grid_C['height'], self.grid_C['width']), dtype=np.object)
         self.next_id = 0
         # The currently open positions (no person on it)
         self.open_positions = []
-        for y in range(grid_height):
-            for x in range(grid_width):
+        for y in range(self.grid_C['height']):
+            for x in range(self.grid_C['width']):
                 self.open_positions.append((x, y))
         # Initialize the grid
         self._initialize_grid()
 
     # Out of bounds
     def _oob(self, x, y):
-        return x < 0 or y < 0 or x >= grid_width or y >= grid_height
+        return x < 0 or y < 0 or x >= self.grid_C['width'] or y >= self.grid_C['height']
 
     # Env wraps so get correct pos
     def _get_cell_pos(self, x, y):
@@ -98,8 +60,8 @@ class CellularAutomation:
                 return max_val - val
             else:
                 return val
-        corrected_x = corrected(x, grid_width)
-        corrected_y = corrected(y, grid_height)
+        corrected_x = corrected(x, self.grid_C['width'])
+        corrected_y = corrected(y, self.grid_C['height'])
         return corrected_x, corrected_y
 
     def _is_empty(self, x=None, y=None, position=None):
@@ -114,8 +76,8 @@ class CellularAutomation:
         position = person.position
         self._clear_cell(position)
         assert person.infected
-        self.data_collect.increment_death_data()
-        self.data_collect.add_lifetime_infected(person.num_people_infected)
+        self.data_collect.increment_death_data(person)
+        self.data_collect.add_lifetime_infected(person.num_people_infected, person.infectious_days_info)
         del self.id_person[id]
 
     def _clear_cell(self, position):
@@ -140,15 +102,15 @@ class CellularAutomation:
     # Grid initialization ------
     def _create_person(self, position):
         assert self._is_empty(position=position)
-        age = np.random.randint(age_range[0], age_range[1]+1)
-        policy = policies_safety[policy_type]
+        age = np.random.randint(self.person_C['age_range'][0], self.person_C['age_range'][1]+1)
+        policy = policies_safety[self.person_C['policy_type']]
         SD_prob = policy['social_distance_prob']
         SD = True if np.random.random() < SD_prob else False
         WM_prob = policy['wear_mask_prob']
         WM = True if np.random.random() < WM_prob else False
         LM_prob = policy['low_movement_prob']
-        LM = movement_prob['low'] if np.random.random() < LM_prob else movement_prob['high']
-        infected = np.random.random() < initial_infection_prob
+        LM = self.person_C['movement_prob']['low'] if np.random.random() < LM_prob else self.person_C['movement_prob']['high']
+        infected = np.random.random() < self.person_C['initial_infection_prob']
 
         if not infected: self.data_collect.increment_initial_S()
 
@@ -164,11 +126,14 @@ class CellularAutomation:
         #                 death_occurrence_range, asymptomatic_prob, get_prob_by_age(severity_by_age),
         #                 get_prob_by_age(case_fatality_rate_by_age_given_severe_symptoms))
 
-        person = Person(position, age, SD, WM, LM, movement_prob['low'], altruistic_prob, infected,
-                        total_length_infection, incubation_period_duration_range,
-                        infectious_start_before_symptoms_range, infectious_period_duration_range, severe_symptoms_start_range,
-                        death_occurrence_range, asymptomatic_prob, severity_prob,
-                        death_prob)
+        person = Person(position, age, SD, WM, LM, self.person_C['movement_prob']['low'],
+                        self.person_C['altruistic_prob'], infected,
+                        self.disease_C['total_length_infection'], self.disease_C['incubation_period_duration_range'],
+                        self.disease_C['infectious_start_before_symptoms_range'],
+                        self.disease_C['infectious_period_duration_range'],
+                        self.disease_C['severe_symptoms_start_range'],
+                        self.disease_C['death_occurrence_range'], self.disease_C['asymptomatic_prob'],
+                        self.disease_C['severity_prob'], self.disease_C['death_prob'])
 
         self.id_person[self.next_id] = person
         data_collect.update_data(person)
@@ -179,7 +144,7 @@ class CellularAutomation:
 
     # Create all the people
     def _initialize_grid(self):
-        for p in range(initial_pop_size):
+        for p in range(self.grid_C['initial_pop_size']):
             # Select random position
             position = random.choice(self.open_positions)
             # Create person
@@ -225,8 +190,9 @@ class CellularAutomation:
         self._check_infection(person, infected_neighbors)
         # Then Moving
         # Move it if its own cell is not safe OR its moving intenionally
+        move_length_SD = 1 if len(safe_cells) < 8 else self.person_C['move_length']  # Move only one time if just moving cuz its unsafe
         if len(safe_cells) < 8 or np.random.random() < person.movement_prob:
-            for m in range(move_length):
+            for m in range(move_length_SD):
                 last_position = person.position
                 did_move = False
                 # Shuffle the safe positions and choose the first actually safe one by checking a 3x3 around it (not including the person.position)
@@ -272,7 +238,7 @@ class CellularAutomation:
         self._check_infection(person, infected_neighbors)
         # Then Moving
         if np.random.random() < person.movement_prob:
-            for m in range(move_length):
+            for m in range(self.person_C['move_length']):
                 # if somewhere to move
                 if len(empty_spots) > 0:
                     new_spot = random.choice(empty_spots)
@@ -284,7 +250,8 @@ class CellularAutomation:
                     break
 
     def _check_infection(self, person, infected_neighbors):
-        newly_infected = person.gets_infected(len(infected_neighbors), base_infection_prob, mask_infection_prob_decrease,
+        newly_infected = person.gets_infected(infected_neighbors, self.disease_C['base_infection_prob'],
+                                              self.disease_C['mask_infection_prob_decrease'],
                                               self.data_collect)
         # If this person was just infected then add to the num of people infected to each neighbor for calc. Ro
         if newly_infected:
@@ -304,23 +271,43 @@ class CellularAutomation:
 
     # For rendering
     def _get_person_color(self, person):
-        if current_color_model == 'SIR':
+        if self.render_C['color_model'] == 'SIR':
             colors = color_models['SIR']
             if person.susceptible: return colors['susceptible']
             if person.infected: return colors['infected']
             return colors['recovered']
+
+    def _render(self, id, screen):
+        person = self.id_person[id]
+        shape_model = self.render_C['shape_model']
+        if shape_model == 'SD':
+            shape = shape_models[shape_model][person.social_distance]
+        else:
+            shape = shape_models[shape_model][person.wear_mask]
+        color = self._get_person_color(person)
+        cell_size = self.render_C['cell_size']
+        if shape == 'rect':
+            pygame.draw.rect(screen, color,
+                             [person.position[0] * cell_size, person.position[1] * cell_size, cell_size, cell_size])
+        else:
+            radius = cell_size // 2
+            center_x = (person.position[0] * cell_size) + radius
+            center_y = (person.position[1] * cell_size) + radius
+            pygame.draw.circle(screen, color, (center_x, center_y), radius)
 
     def run(self, render=False):
         if render:
             # Initialize the game engine
             pygame.init()
             # Set the height and width and title of the screen
+            screen_width = self.render_C['cell_size'] * self.grid_C['width']
+            screen_height = self.render_C['cell_size'] * self.grid_C['height']
             screen = pygame.display.set_mode((screen_width, screen_height))
             pygame.display.set_caption("Population Dynamics")
             clock = pygame.time.Clock()
             # Initially set the screen to all black
             screen.fill((0, 0, 0))
-        for t in range(number_iterations):
+        for t in range(self.grid_C['number_iterations']):
             self.data_collect.reset(t)
             def loop_through_ids(ids):
                 # Keep track of any switches between SD lists
@@ -337,11 +324,8 @@ class CellularAutomation:
                     elif new_SD is False: new_not_SD_list.append(id)
                     # Update data collection
                     self.data_collect.update_data(self.id_person[id])
-                    # Render if not dead
-                    if render:
-                        person = self.id_person[id]
-                        pygame.draw.rect(screen, self._get_person_color(person),
-                                         [person.position[0] * cell_size, person.position[1] * cell_size, cell_size, cell_size])
+                    # Render
+                    if render: self._render(id, screen)
                 return new_SD_list, new_not_SD_list
             # Update (in random order) those who do NOT practice social distancing
             new_SD, new_not_SD_list = loop_through_ids(self.ids_not_social_distance)
@@ -361,10 +345,11 @@ class CellularAutomation:
                 pygame.display.flip()
                 screen.fill((0, 0, 0))
                 # Frames per second
-                if fps: clock.tick(fps)
+                if self.render_C['fps']: clock.tick(self.render_C['fps'])
         self.data_collect.reset(t+1, last=True)
 
+constants = json.load(open('constants.json'))
 data_collect = DataCollector()
 data_collect.set_print_options(basic_to_print=['S', 'I', 'R', 'death'])
-CA = CellularAutomation(data_collect)
-CA.run(render=False)
+CA = CellularAutomation(constants, data_collect)
+CA.run(render=True)

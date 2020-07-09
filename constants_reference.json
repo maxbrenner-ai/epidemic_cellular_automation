@@ -1,0 +1,35 @@
+{
+  "grid": {
+    "width": "Width in cells of grid",
+    "height": "Height in cells of grid",
+    "initial_pop_size": "Number of people initially spawned in grid",
+    "number_iterations": "Number of total iterations of simulation"
+  },
+  "render": {
+    "cell_size": "Cell width/height in pixels",
+    "color_model": "How to color people",
+    "shape_model": "How to shape people",
+    "fps": "How fast in frames-per-second to run the simulation ('None' for as-fast-as-possible)"
+  },
+  "person": {
+    "age_range": "The range for selecting someone's age",
+    "movement_prob": "Defines the probability of a person moving each iteration, low movement and high movement",
+    "move_length": "Number of steps a person can take if they decide to move",
+    "initial_infection_prob": "The probability of infection when initially spawning people",
+    "altruistic_prob": "Probability of being altruistic and therefore social distancing and wearing a mask when symptoms arise",
+    "policy_type": "Picks one of the predefined policies in 'main.py' which defines initial spawn probabilities for social distancing, wearing a mask and not moving around too much"
+  },
+  "disease": {
+    "base_infection_prob": "The base infection probability of one infectious person",
+    "mask_infection_prob_decrease": "The decrease in 'base_infection_prob' if the infectious person is wearing a mask",
+    "total_length_infection": "Total length in days (usually) of the infection in a person (REF 3)",
+    "incubation_period_duration_range": "Range of possible number of incubation days (REF 3)",
+    "infectious_period_duration_range": "Range of possible number of infectious days (REF 3)",
+    "infectious_start_before_symptoms_range": "Range of possible number of days the infectious stage starts before symptoms start (REF 3)",
+    "severity_prob": "The probability of severe symptoms (given not asymptomatic) (REF 8)",
+    "severe_symptoms_start_range": "The range of possible number of days that severe symptoms begin after mild symptoms starting",
+    "death_prob": "The probability of death occurring (given severe symptoms, hence why its high-ish) (REF 8)",
+    "death_occurrence_range": "The range of possible number of days that death occurs after severe symptoms begin",
+    "asymptomatic_prob": "The probability of being asymptomatic (no symptoms but still infectious) (REF 1)"
+  }
+}
