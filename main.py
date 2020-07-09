@@ -57,7 +57,6 @@ case_fatality_rate_by_age_given_severe_symptoms = [(10, 0.04), (20, 0.02), (40, 
 
 death_prob = 0.25
 
-# todo: add a testing policy!!!!!
 policies_safety = {
     'high': {'social_distance_prob': 0.75, 'wear_mask_prob': 0.75, 'low_movement_prob': 0.75},
     'medium': {'social_distance_prob': 0.5, 'wear_mask_prob': 0.5, 'low_movement_prob': 0.5},

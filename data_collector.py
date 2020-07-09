@@ -81,7 +81,7 @@ class DataCollector:
                 if 'R0' in self.adv_to_print and bin_avg != None:
                     st += '\nBasic Reproduction Number (R0): {:.02f}'.format(bin_avg)
                 if 'R0S' in self.adv_to_print and bin_avg != None:
-                    st += '\nR0S: {} x {} = {:.02f}'.format(bin_avg, self.current_data['S'], bin_avg * self.current_data['S'])
+                    st += '\nR0S: {:.02f} x {} = {:.02f}'.format(bin_avg, self.current_data['S'], bin_avg * self.current_data['S'])
             print(st)
         # Reset data
         for k in list(self.current_data.keys()):
@@ -89,5 +89,5 @@ class DataCollector:
         # If last print advanced equations
         if last:
             if 'SAR' in self.adv_to_print:
-                print('Secondary Attack Rate (SAR): {:.02f} / {} = {:.02f}'.format(self.total_infected, self.initial_S,
+                print('Secondary Attack Rate (SAR): {} / {} = {:.02f}'.format(self.total_infected, self.initial_S,
                                                                        self.total_infected / self.initial_S))
