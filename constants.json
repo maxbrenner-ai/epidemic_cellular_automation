@@ -20,7 +20,7 @@
     "policy_type": "low"
   },
   "disease": {
-    "base_infection_prob": 0.3,
+    "base_infection_prob": 0.2,
     "mask_infection_prob_decrease": 0.1,
     "total_length_infection": 14,
     "incubation_period_duration_range": [4, 6],

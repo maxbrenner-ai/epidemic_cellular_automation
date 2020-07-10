@@ -1,0 +1,7 @@
+AGE STUFF BELOW NOT USED ------------
+Starting at each age given (keys): values are the prob for severe (o.w. mild)
+severity_by_age = [(10, 0.05), (20, 0.1), (40, 0.2), (60, 0.4)]  # Based off of REF 8 (but I had to make up some things)
+The prob of death GIVEN severe symptoms (by age in the same way as severity by age)
+Since dying is a subset of severe (only people who had severe symptoms died) then its just fatality (given by REF 8)
+divided by severity by age (which I made up but is still based off of REF 8)
+case_fatality_rate_by_age_given_severe_symptoms = [(10, 0.04), (20, 0.02), (40, 0.02), (50, 0.065), (60, 0.2), (70, 0.37)]

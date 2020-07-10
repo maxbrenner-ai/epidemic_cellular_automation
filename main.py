@@ -5,22 +5,19 @@ import pygame
 from data_collector import DataCollector
 import json
 
-# np.random.seed(42)
 
+# Different color models (only one right now)
 color_models = {'SIR': {'susceptible': (204, 255, 204), 'infected': (255, 204, 204), 'recovered': (204, 204, 255)}}
+# Different shape models (if you care about SD or WM more)
 shape_models = {'SD': {True: 'circle', False: 'rect'},
                 'WM': {True: 'circle', False: 'rect'}}
-# Starting at each age given (keys): values are the prob for severe (o.w. mild)
-# severity_by_age = [(10, 0.05), (20, 0.1), (40, 0.2), (60, 0.4)]  # Based off of REF 8 (but I had to make up some things)
-# The prob of death GIVEN severe symptoms (by age in the same way as severity by age)
-# Since dying is a subset of severe (only people who had severe symptoms died) then its just fatality (given by REF 8)
-# divided by severity by age (which I made up but is still based off of REF 8)
-# case_fatality_rate_by_age_given_severe_symptoms = [(10, 0.04), (20, 0.02), (40, 0.02), (50, 0.065), (60, 0.2), (70, 0.37)]
+# Policies that define overall safety level of the population
 policies_safety = {
     'high': {'social_distance_prob': 0.75, 'wear_mask_prob': 0.75, 'low_movement_prob': 0.75},
     'medium': {'social_distance_prob': 0.5, 'wear_mask_prob': 0.5, 'low_movement_prob': 0.5},
     'low': {'social_distance_prob': 0.25, 'wear_mask_prob': 0.25, 'low_movement_prob': 0.25},
 }
+
 
 class CellularAutomation:
     def __init__(self, constants, data_collect):
@@ -37,6 +34,7 @@ class CellularAutomation:
         # The person objects
         # id (int): person (object)
         self.id_person = {}
+        # Grid stores the person IDs in a 2D structure
         self.grid = np.empty(shape=(self.grid_C['height'], self.grid_C['width']), dtype=np.object)
         self.next_id = 0
         # The currently open positions (no person on it)
@@ -51,7 +49,7 @@ class CellularAutomation:
     def _oob(self, x, y):
         return x < 0 or y < 0 or x >= self.grid_C['width'] or y >= self.grid_C['height']
 
-    # Env wraps so get correct pos
+    # Env wraps - so get correct pos
     def _get_cell_pos(self, x, y):
         def corrected(val, max_val):
             if val < 0:
@@ -64,11 +62,13 @@ class CellularAutomation:
         corrected_y = corrected(y, self.grid_C['height'])
         return corrected_x, corrected_y
 
+    # Is the cell empty
     def _is_empty(self, x=None, y=None, position=None):
         if x and y:
             return self.grid[y, x] is None
         return self.grid[position[1], position[0]] is None
 
+    # A person can die from the disease
     def _kill_person(self, id, social_distance):
         person = self.id_person[id]
         if social_distance: self.ids_social_distance.remove(id)
@@ -77,7 +77,8 @@ class CellularAutomation:
         self._clear_cell(position)
         assert person.infected
         self.data_collect.increment_death_data(person)
-        self.data_collect.add_lifetime_infected(person.num_people_infected, person.infectious_days_info)
+        # todo: Not sure if I should keep this because if someone dies early then they dont really get a full infectious lifetime
+        # self.data_collect.add_lifetime_infected(person.num_people_infected, person.infectious_days_info)
         del self.id_person[id]
 
     def _clear_cell(self, position):
@@ -91,7 +92,6 @@ class CellularAutomation:
         self.open_positions.remove(position)
 
     def _move_person(self, id, person, new_position):
-        # assert self._is_empty(position=new_position)
         current_position = person.position
         # Clear current position
         self._clear_cell(current_position)
@@ -113,18 +113,6 @@ class CellularAutomation:
         infected = np.random.random() < self.person_C['initial_infection_prob']
 
         if not infected: self.data_collect.increment_initial_S()
-
-        def get_prob_by_age(arr):
-            for age_prob in arr:
-                age_min, prob = age_prob[0], age_prob[1]
-                if age >= age_min:
-                    return prob
-            raise AssertionError('age {} not correct'.format(age))
-        # person = Person(position, age, SD, WM, LM, movement_prob['low'], altruistic_prob, infected,
-        #                 total_length_infection, incubation_period_duration_range,
-        #                 infectious_start_before_symptoms_range, infectious_period_duration_range, severe_symptoms_start_range,
-        #                 death_occurrence_range, asymptomatic_prob, get_prob_by_age(severity_by_age),
-        #                 get_prob_by_age(case_fatality_rate_by_age_given_severe_symptoms))
 
         person = Person(position, age, SD, WM, LM, self.person_C['movement_prob']['low'],
                         self.person_C['altruistic_prob'], infected,
@@ -151,7 +139,7 @@ class CellularAutomation:
             self._create_person(position)
 
     # Yield neighbors
-    # Return Neighbor (or None), neighbor_position
+    # Return Neighbor (or None), neighbor_position absolute and relative
     def _yield_neighbors(self, position, side_length):
         x, y = position[0], position[1]
         for i in range(side_length ** 2):
@@ -348,8 +336,13 @@ class CellularAutomation:
                 if self.render_C['fps']: clock.tick(self.render_C['fps'])
         self.data_collect.reset(t+1, last=True)
 
-constants = json.load(open('constants.json'))
-data_collect = DataCollector()
-data_collect.set_print_options(basic_to_print=['S', 'I', 'R', 'death'])
-CA = CellularAutomation(constants, data_collect)
-CA.run(render=True)
+
+if __name__ == '__main__':
+    constants = json.load(open('constants.json'))
+    # Can save a run as an experiment which saves the data, visualizations and constants in a experiments directory
+    data_collect = DataCollector(constants, save_experiment=True, print_visualizations=True)
+    # Can print data (look at `data_options` at top of `data_collector.py` for options) and how often to print
+    data_collect.set_print_options(basic_to_print=['S', 'I', 'R', 'death'], frequency=1)
+    CA = CellularAutomation(constants, data_collect)
+    # Can render each timestep with pygame
+    CA.run(render=True)

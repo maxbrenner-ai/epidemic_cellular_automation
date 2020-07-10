@@ -1,2 +1,0 @@
-- if new way takes too long can:
-    - Not check the neighbhrod on the LAST move (meaning dont check infection after the last move)

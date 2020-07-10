@@ -2,7 +2,7 @@ import numpy as np
 
 '''
 Notes:
-- There are separate probs for wearing a mask and social distancing, meaning some people will do both, one or the other
+- There are separate probabilities for wearing a mask and social distancing, meaning some people will do both, one or the other
   or neither
 - There is an altruistic prob, where people who get mild symptoms have a chance of wearing a mask and social
   distancing (for as long as their symptoms last) if they weren't before.
@@ -15,7 +15,7 @@ class Person:
                  total_length_infection, incubation_period_duration_range, infectious_start_before_symptoms_range,
                  infectious_period_duration_range, severe_symptoms_start_range, fatality_occur_range,
                  asymptomatic_prob, severe_prob, fatality_prob):
-        self.position = self.set_position(position)
+        self.set_position(position)
         self.age = age
         self.social_distance = social_distance
         self.social_distance_before_symptoms = social_distance
@@ -25,12 +25,6 @@ class Person:
         self.low_movement_prob = low_movement_prob
         self.movement_prob_before_symptoms = movement_prob
         self.altruistic = np.random.random() < altruistic_prob
-
-        # Anyone with severe symptoms goes to hospital
-        # self.hospitalized = False
-        # Anyone with mild symptoms self-isolates
-        # so this is probably a little more altruistic than normal unfortunately
-        # self.self_isolating = False
 
         self.susceptible = not infected
         self.infected = infected
@@ -107,10 +101,6 @@ class Person:
         self.current_symptom_stage = None
         self.current_infection_stage = None
 
-        # print('Age: {} -- SD: {} -- WM: {} -- Movement: {} -- Altruitsic: {}'.format(self.age, self.social_distance, self.wear_mask, self.movement_prob, self.altruistic))
-        # print('Infectious periods: {}'.format(self.infectious_periods))
-        # print('Symptoms periods: {}'.format(self.symptoms_periods))
-
     def set_position(self, position):
         self.position = position
 
@@ -118,6 +108,7 @@ class Person:
     def is_infectious(self):
         return self.current_infection_stage == 'infectious'
 
+    # Progress the infection of an infected person in both infectiousness and symptoms
     def progress_infection(self, data_collector):
         if not self.infected:
             return False, None
@@ -168,6 +159,7 @@ class Person:
             new_SD = self.social_distance_before_symptoms if self.social_distance != self.social_distance_before_symptoms else None
             self.social_distance = self.social_distance_before_symptoms
             self.movement_prob = self.movement_prob_before_symptoms
+            self.current_symptom_stage = None
             data_collector.add_lifetime_infected(self.num_people_infected, self.infectious_days_info)
 
         return False, new_SD
@@ -180,6 +172,7 @@ class Person:
             return False
         # Use Kermack-McKendrick Model of infection probability
         # 1 - (1 - p) ^ r; p -> infection prob of one person; r -> number of infectious people
+        # If an infectious person is wearing a mask then the probability of infecting this susceptible person goes down
         p = [base_infection_prob + (-1. * (neighbor.wear_mask * mask_infection_prob_decrease)) for neighbor in infectious_neighbors]
         p = sum(p) / len(p)
         r = len(infectious_neighbors)
