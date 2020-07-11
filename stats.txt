@@ -65,8 +65,6 @@ REF 9
 - No number for infection protection found for masks
     - Generally masks dont lower your chance of infection but it does lower the chance of people around you getting it
     if you are infected
-- No number for infection protection found for social distancing
-    - It helps lower infection prob for you and others (if you are infected)
 
 REF 10
 - R0 is about 2-2.5 (https://www.businessinsider.com/coronavirus-contagious-r-naught-average-patient-spread-2020-3)
