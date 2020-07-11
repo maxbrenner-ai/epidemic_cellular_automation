@@ -26,8 +26,8 @@ class DataCollector:
         self._reset_data_options(hist=True)
         # Advanced Infection data collection
         # WM, SD, both, neither, total
-        self.adv_infection_data = {'total': 0, 'WM': 0, 'SD': 0, 'both': 0, 'neither': 0}
-        self.adv_infection_data_history = OrderedDict({'total': [], 'WM': [], 'SD': [], 'both': [], 'neither': []})
+        self.adv_infection_data = {'total': 0, 'SD': 0, 'not SD': 0}
+        self.adv_infection_data_history = OrderedDict({'total': [], 'SD': [], 'not SD': []})
         # For adv equations
         # For SAR (Secondary Attack Rate) need total number of infected overtime
         self.total_infected = 0
@@ -38,7 +38,7 @@ class DataCollector:
         self.current_bin_lifetime_infected = []
         # Saves all the bin averages
         self.lifetime_infected_bin_avgs = OrderedDict()
-        self.last_bin_avgs = {'total': None, 'SD': None, 'not SD': None, 'WM': None, 'not WM': None}
+        self.last_bin_avgs = {'total': None, 'SD': None, 'not SD': None, 'WM': None, 'not WM': None, 'both': None, 'neither': None}
 
     def _reset_data_options(self, hist=False):
         self.current_data = {}
@@ -60,14 +60,10 @@ class DataCollector:
 
     def _update_adv_infection_data(self, person):
         SD = person.social_distance
-        WM = person.wear_mask
-        both = SD and WM
-        neither = not SD and not WM
+        not_SD = not SD
         self.adv_infection_data['total'] += 1
         if SD: self.adv_infection_data['SD'] += 1
-        if WM: self.adv_infection_data['WM'] += 1
-        if both: self.adv_infection_data['both'] += 1
-        if neither: self.adv_infection_data['neither'] += 1
+        if not_SD: self.adv_infection_data['not SD'] += 1
 
     def update_data(self, person):
         self.current_data['S'] += person.susceptible
@@ -91,7 +87,10 @@ class DataCollector:
         # Bin infectious_days_info into majority SD, minority SD, majority WM, minority WM (ie did they SD more often then not)
         SD = infectious_days_info['SD'] > infectious_days_info['not SD']
         WM = infectious_days_info['WM'] > infectious_days_info['not WM']
-        self.current_bin_lifetime_infected.append({'total': num_infected, 'SD': SD, 'not SD': not SD, 'WM': WM, 'not WM': not WM})
+        both = SD and WM
+        neither = not SD and not WM
+        self.current_bin_lifetime_infected.append({'total': num_infected, 'SD': SD, 'not SD': not SD, 'WM': WM,
+                                                   'not WM': not WM, 'both': both, 'neither': neither})
 
     def reset(self, timestep, last=False):
         # Aggregate history data
@@ -142,8 +141,8 @@ class DataCollector:
             if 'SAR' in self.adv_to_print:
                 print('Secondary Attack Rate (SAR): {} / {} = {:.02f}'.format(self.total_infected, self.initial_S, SAR))
             # Convert the lifetime infected bin avgs to a a dict of lists and a list for the x-vals
-            self.R0_hist = {'total': [], 'SD': [], 'WM': [], 'not SD': [], 'not WM': []}
-            self.R0S_hist = {'total': [], 'SD': [], 'WM': [], 'not SD': [], 'not WM': []}
+            self.R0_hist = {'total': [], 'SD': [], 'WM': [], 'not SD': [], 'not WM': [], 'both': [], 'neither': []}
+            self.R0S_hist = {'total': [], 'SD': [], 'WM': [], 'not SD': [], 'not WM': [], 'both': [], 'neither': []}
             self.R0_xvals = []
             for x_val, info in list(self.lifetime_infected_bin_avgs.items()):
                 self.R0_xvals.append(x_val)
@@ -158,30 +157,32 @@ class DataCollector:
             fig, axs = plt.subplots(2, 2, figsize=(15, 10))
             # Infections
             I_xvals = list(range(len(self.adv_infection_data_history['total'])))
-            axs[0, 0].plot(I_xvals, self.adv_infection_data_history['total'], label='total')
-            axs[0, 0].plot(I_xvals, self.adv_infection_data_history['SD'], label='SD')
-            axs[0, 0].plot(I_xvals, self.adv_infection_data_history['WM'], label='WM')
-            axs[0, 0].plot(I_xvals, self.adv_infection_data_history['both'], label='SD + WM')
-            axs[0, 0].plot(I_xvals, self.adv_infection_data_history['neither'], label='Neither')
-            axs[0, 0].set_title('Infections based on SD and WM')
+            axs[0, 0].plot(I_xvals, self.adv_infection_data_history['total'], 'C0', label='total')
+            axs[0, 0].plot(I_xvals, self.adv_infection_data_history['SD'], 'C2', label='SD')
+            axs[0, 0].plot(I_xvals, self.adv_infection_data_history['not SD'], 'C3', label='not SD')
+            axs[0, 0].set_title('Infections based on SD')
             axs[0, 0].legend(loc="upper left")
 
             # R0
             R0_xvals = self.R0_xvals
-            axs[1, 0].plot(R0_xvals, self.R0_hist['total'], label='total')
-            axs[1, 0].plot(R0_xvals, self.R0_hist['SD'], label='SD')
-            axs[1, 0].plot(R0_xvals, self.R0_hist['not SD'], label='not SD')
-            axs[1, 0].plot(R0_xvals, self.R0_hist['WM'], label='WM')
-            axs[1, 0].plot(R0_xvals, self.R0_hist['not WM'], label='not WM')
+            axs[1, 0].plot(R0_xvals, self.R0_hist['total'], 'C0', label='total')
+            axs[1, 0].plot(R0_xvals, self.R0_hist['SD'], 'C2', label='SD')
+            axs[1, 0].plot(R0_xvals, self.R0_hist['not SD'], 'C3', label='not SD')
+            axs[1, 0].plot(R0_xvals, self.R0_hist['WM'], 'C4', label='WM')
+            axs[1, 0].plot(R0_xvals, self.R0_hist['not WM'], 'C1', label='not WM')
+            axs[1, 0].plot(R0_xvals, self.R0_hist['both'], 'C5', label='both')
+            axs[1, 0].plot(R0_xvals, self.R0_hist['neither'], 'C6', label='neither')
             axs[1, 0].set_title('R0 based on SD and WM')
             axs[1, 0].legend(loc="upper left")
 
             # R0S
-            axs[1, 1].plot(R0_xvals, self.R0S_hist['total'], label='total')
-            axs[1, 1].plot(R0_xvals, self.R0S_hist['SD'], label='SD')
-            axs[1, 1].plot(R0_xvals, self.R0S_hist['not SD'], label='not SD')
-            axs[1, 1].plot(R0_xvals, self.R0S_hist['WM'], label='WM')
-            axs[1, 1].plot(R0_xvals, self.R0S_hist['not WM'], label='not WM')
+            axs[1, 1].plot(R0_xvals, self.R0S_hist['total'], 'C0', label='total')
+            axs[1, 1].plot(R0_xvals, self.R0S_hist['SD'], 'C2', label='SD')
+            axs[1, 1].plot(R0_xvals, self.R0S_hist['not SD'], 'C3', label='not SD')
+            axs[1, 1].plot(R0_xvals, self.R0S_hist['WM'], 'C4', label='WM')
+            axs[1, 1].plot(R0_xvals, self.R0S_hist['not WM'], 'C1', label='not WM')
+            axs[1, 1].plot(R0_xvals, self.R0S_hist['both'], 'C5', label='both')
+            axs[1, 1].plot(R0_xvals, self.R0S_hist['neither'], 'C6', label='neither')
             axs[1, 1].set_title('R0S based on SD and WM')
             axs[1, 1].legend(loc="upper left")
 
