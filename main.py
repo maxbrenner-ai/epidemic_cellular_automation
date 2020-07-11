@@ -340,9 +340,9 @@ class CellularAutomation:
 if __name__ == '__main__':
     constants = json.load(open('constants.json'))
     # Can save a run as an experiment which saves the data, visualizations and constants in a experiments directory
-    data_collect = DataCollector(constants, save_experiment=True, print_visualizations=True)
+    data_collect = DataCollector(constants, save_experiment=False, print_visualizations=False)
     # Can print data (look at `data_options` at top of `data_collector.py` for options) and how often to print
     data_collect.set_print_options(basic_to_print=['S', 'I', 'R', 'death'], frequency=1)
     CA = CellularAutomation(constants, data_collect)
     # Can render each timestep with pygame
-    CA.run(render=True)
+    CA.run(render=False)
