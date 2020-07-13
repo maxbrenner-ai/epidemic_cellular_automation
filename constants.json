@@ -9,15 +9,16 @@
     "cell_size": 8,
     "color_model": "SIR",
     "shape_model": "SD",
-    "fps": null
+    "fps": 1
   },
   "person": {
     "age_range": [10, 80],
-    "movement_prob": {"low": 0.25, "high": 0.75},
+    "movement_prob": 0.50,
+    "altruistic_movement_prob": 0.25,
     "move_length": 6,
     "initial_infection_prob": 0.05,
     "altruistic_prob": 0.75,
-    "policy_type": "low"
+    "policy_type": "medium"
   },
   "disease": {
     "base_infection_prob": 0.2,

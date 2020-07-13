@@ -13,9 +13,10 @@ shape_models = {'SD': {True: 'circle', False: 'rect'},
                 'WM': {True: 'circle', False: 'rect'}}
 # Policies that define overall safety level of the population
 policies_safety = {
-    'high': {'social_distance_prob': 0.75, 'wear_mask_prob': 0.75, 'low_movement_prob': 0.75},
-    'medium': {'social_distance_prob': 0.5, 'wear_mask_prob': 0.5, 'low_movement_prob': 0.5},
-    'low': {'social_distance_prob': 0.25, 'wear_mask_prob': 0.25, 'low_movement_prob': 0.25},
+    'very high': {'social_distance_prob': 0.75, 'wear_mask_prob': 0.75},
+    'high': {'social_distance_prob': 0.5, 'wear_mask_prob': 0.5},
+    'medium': {'social_distance_prob': 0.25, 'wear_mask_prob': 0.25},
+    'low': {'social_distance_prob': 0.10, 'wear_mask_prob': 0.10},
 }
 
 
@@ -108,13 +109,11 @@ class CellularAutomation:
         SD = True if np.random.random() < SD_prob else False
         WM_prob = policy['wear_mask_prob']
         WM = True if np.random.random() < WM_prob else False
-        LM_prob = policy['low_movement_prob']
-        LM = self.person_C['movement_prob']['low'] if np.random.random() < LM_prob else self.person_C['movement_prob']['high']
         infected = np.random.random() < self.person_C['initial_infection_prob']
 
         if not infected: self.data_collect.increment_initial_S()
 
-        person = Person(position, age, SD, WM, LM, self.person_C['movement_prob']['low'],
+        person = Person(position, age, SD, WM, self.person_C['movement_prob'], self.person_C['altruistic_movement_prob'],
                         self.person_C['altruistic_prob'], infected,
                         self.disease_C['total_length_infection'], self.disease_C['incubation_period_duration_range'],
                         self.disease_C['infectious_start_before_symptoms_range'],
@@ -340,9 +339,9 @@ class CellularAutomation:
 if __name__ == '__main__':
     constants = json.load(open('constants.json'))
     # Can save a run as an experiment which saves the data, visualizations and constants in a experiments directory
-    data_collect = DataCollector(constants, save_experiment=False, print_visualizations=False)
+    data_collect = DataCollector(constants, save_experiment=True, print_visualizations=True)
     # Can print data (look at `data_options` at top of `data_collector.py` for options) and how often to print
     data_collect.set_print_options(basic_to_print=['S', 'I', 'R', 'death'], frequency=1)
     CA = CellularAutomation(constants, data_collect)
     # Can render each timestep with pygame
-    CA.run(render=False)
+    CA.run(render=True)

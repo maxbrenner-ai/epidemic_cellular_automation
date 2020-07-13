@@ -13,7 +13,8 @@
   },
   "person": {
     "age_range": "The range for selecting someone's age",
-    "movement_prob": "Defines the probability of a person moving each iteration, low movement and high movement",
+    "movement_prob": "Defines the probability of a person moving each iteration",
+    "altruistic_movement_prob": "The movement probability of someone who is altruistic (defined below)",
     "move_length": "Number of steps a person can take if they decide to move",
     "initial_infection_prob": "The probability of infection when initially spawning people",
     "altruistic_prob": "Probability of being altruistic and therefore social distancing and wearing a mask when symptoms arise",
