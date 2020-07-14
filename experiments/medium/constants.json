@@ -1,0 +1,54 @@
+{
+    "grid": {
+        "width": 75,
+        "height": 75,
+        "initial_pop_size": 500,
+        "number_iterations": 50
+    },
+    "render": {
+        "cell_size": 8,
+        "color_model": "SIR",
+        "shape_model": "SD",
+        "fps": 2
+    },
+    "person": {
+        "age_range": [
+            10,
+            80
+        ],
+        "movement_prob": 0.5,
+        "altruistic_movement_prob": 0.25,
+        "move_length": 6,
+        "initial_infection_prob": 0.05,
+        "altruistic_prob": 0.75,
+        "policy_type": "medium"
+    },
+    "disease": {
+        "base_infection_prob": 0.2,
+        "mask_infection_prob_decrease": 0.1,
+        "total_length_infection": 14,
+        "incubation_period_duration_range": [
+            4,
+            6
+        ],
+        "infectious_period_duration_range": [
+            8,
+            9
+        ],
+        "infectious_start_before_symptoms_range": [
+            2,
+            3
+        ],
+        "severity_prob": 0.19,
+        "severe_symptoms_start_range": [
+            2,
+            4
+        ],
+        "death_occurrence_range": [
+            2,
+            4
+        ],
+        "asymptomatic_prob": 0.35,
+        "death_prob": 0.49
+    }
+}

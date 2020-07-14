@@ -1,0 +1,889 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20202.20.0525.1210                               -->
+<workbook original-version='18.1' source-build='2020.2.1 (20202.20.0525.1210)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='infection_data.csv+ (Multiple Connections)' inline='true' name='federated.15oxx2r02ykjar15vq0tx04qcf0p' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='infection_data' name='textscan.12st0lv0jpogfe15fpexe1az7zzu'>
+            <connection class='textscan' directory='C:/Users/Max Brenner/PycharmProjects/epidemic_cellular_automation/experiments/low' filename='infection_data.csv' password='' server='' />
+          </named-connection>
+          <named-connection caption='infection_data (2)' name='textscan.1mfs8u01l15umz0zponf30pnzd52'>
+            <connection class='textscan' directory='C:/Users/Max Brenner/PycharmProjects/epidemic_cellular_automation/experiments/medium' filename='infection_data.csv' password='' server='' />
+          </named-connection>
+          <named-connection caption='infection_data (3)' name='textscan.0gc1amb1ukk8lb1g9plx91yx8jhr'>
+            <connection class='textscan' directory='C:/Users/Max Brenner/PycharmProjects/epidemic_cellular_automation/experiments/high' filename='infection_data.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation join='inner' type='join'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[infection_data.csv].[timestep]' />
+              <expression op='[infection_data.csv2].[timestep]' />
+            </expression>
+          </clause>
+          <relation join='inner' type='join'>
+            <clause type='join'>
+              <expression op='='>
+                <expression op='[infection_data.csv].[timestep]' />
+                <expression op='[infection_data.csv1].[timestep]' />
+              </expression>
+            </clause>
+            <relation connection='textscan.12st0lv0jpogfe15fpexe1az7zzu' name='infection_data.csv' table='[infection_data#csv]' type='table'>
+              <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                <column datatype='integer' name='total' ordinal='0' />
+                <column datatype='integer' name='SD' ordinal='1' />
+                <column datatype='integer' name='not SD' ordinal='2' />
+                <column datatype='integer' name='timestep' ordinal='3' />
+              </columns>
+            </relation>
+            <relation connection='textscan.1mfs8u01l15umz0zponf30pnzd52' name='infection_data.csv1' table='[infection_data#csv]' type='table'>
+              <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                <column datatype='integer' name='total' ordinal='0' />
+                <column datatype='integer' name='SD' ordinal='1' />
+                <column datatype='integer' name='not SD' ordinal='2' />
+                <column datatype='integer' name='timestep' ordinal='3' />
+              </columns>
+            </relation>
+          </relation>
+          <relation connection='textscan.0gc1amb1ukk8lb1g9plx91yx8jhr' name='infection_data.csv2' table='[infection_data#csv]' type='table'>
+            <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+              <column datatype='integer' name='total' ordinal='0' />
+              <column datatype='integer' name='SD' ordinal='1' />
+              <column datatype='integer' name='not SD' ordinal='2' />
+              <column datatype='integer' name='timestep' ordinal='3' />
+            </columns>
+          </relation>
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation join='inner' type='join'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[infection_data.csv].[timestep]' />
+              <expression op='[infection_data.csv2].[timestep]' />
+            </expression>
+          </clause>
+          <relation join='inner' type='join'>
+            <clause type='join'>
+              <expression op='='>
+                <expression op='[infection_data.csv].[timestep]' />
+                <expression op='[infection_data.csv1].[timestep]' />
+              </expression>
+            </clause>
+            <relation connection='textscan.12st0lv0jpogfe15fpexe1az7zzu' name='infection_data.csv' table='[infection_data#csv]' type='table'>
+              <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                <column datatype='integer' name='total' ordinal='0' />
+                <column datatype='integer' name='SD' ordinal='1' />
+                <column datatype='integer' name='not SD' ordinal='2' />
+                <column datatype='integer' name='timestep' ordinal='3' />
+              </columns>
+            </relation>
+            <relation connection='textscan.1mfs8u01l15umz0zponf30pnzd52' name='infection_data.csv1' table='[infection_data#csv]' type='table'>
+              <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                <column datatype='integer' name='total' ordinal='0' />
+                <column datatype='integer' name='SD' ordinal='1' />
+                <column datatype='integer' name='not SD' ordinal='2' />
+                <column datatype='integer' name='timestep' ordinal='3' />
+              </columns>
+            </relation>
+          </relation>
+          <relation connection='textscan.0gc1amb1ukk8lb1g9plx91yx8jhr' name='infection_data.csv2' table='[infection_data#csv]' type='table'>
+            <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+              <column datatype='integer' name='total' ordinal='0' />
+              <column datatype='integer' name='SD' ordinal='1' />
+              <column datatype='integer' name='not SD' ordinal='2' />
+              <column datatype='integer' name='timestep' ordinal='3' />
+            </columns>
+          </relation>
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <cols>
+          <map key='[SD (infection_data.csv1)]' value='[infection_data.csv1].[SD]' />
+          <map key='[SD (infection_data.csv2)]' value='[infection_data.csv2].[SD]' />
+          <map key='[SD]' value='[infection_data.csv].[SD]' />
+          <map key='[not SD (infection_data.csv1)]' value='[infection_data.csv1].[not SD]' />
+          <map key='[not SD (infection_data.csv2)]' value='[infection_data.csv2].[not SD]' />
+          <map key='[not SD]' value='[infection_data.csv].[not SD]' />
+          <map key='[timestep (infection_data.csv1)]' value='[infection_data.csv1].[timestep]' />
+          <map key='[timestep (infection_data.csv2)]' value='[infection_data.csv2].[timestep]' />
+          <map key='[timestep]' value='[infection_data.csv].[timestep]' />
+          <map key='[total (infection_data.csv1)]' value='[infection_data.csv1].[total]' />
+          <map key='[total (infection_data.csv2)]' value='[infection_data.csv2].[total]' />
+          <map key='[total]' value='[infection_data.csv].[total]' />
+        </cols>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[infection_data.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[infection_data.csv1]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[infection_data.csv2]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>total</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[total]</local-name>
+            <parent-name>[infection_data.csv]</parent-name>
+            <remote-alias>total</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SD</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[SD]</local-name>
+            <parent-name>[infection_data.csv]</parent-name>
+            <remote-alias>SD</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>not SD</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[not SD]</local-name>
+            <parent-name>[infection_data.csv]</parent-name>
+            <remote-alias>not SD</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>timestep</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[timestep]</local-name>
+            <parent-name>[infection_data.csv]</parent-name>
+            <remote-alias>timestep</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>total</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[total (infection_data.csv1)]</local-name>
+            <parent-name>[infection_data.csv1]</parent-name>
+            <remote-alias>total</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SD</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[SD (infection_data.csv1)]</local-name>
+            <parent-name>[infection_data.csv1]</parent-name>
+            <remote-alias>SD</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>not SD</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[not SD (infection_data.csv1)]</local-name>
+            <parent-name>[infection_data.csv1]</parent-name>
+            <remote-alias>not SD</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>timestep</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[timestep (infection_data.csv1)]</local-name>
+            <parent-name>[infection_data.csv1]</parent-name>
+            <remote-alias>timestep</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>total</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[total (infection_data.csv2)]</local-name>
+            <parent-name>[infection_data.csv2]</parent-name>
+            <remote-alias>total</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SD</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[SD (infection_data.csv2)]</local-name>
+            <parent-name>[infection_data.csv2]</parent-name>
+            <remote-alias>SD</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>not SD</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[not SD (infection_data.csv2)]</local-name>
+            <parent-name>[infection_data.csv2]</parent-name>
+            <remote-alias>not SD</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>timestep</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[timestep (infection_data.csv2)]</local-name>
+            <parent-name>[infection_data.csv2]</parent-name>
+            <remote-alias>timestep</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='SD (infection data.csv1)' datatype='integer' name='[SD (infection_data.csv1)]' role='measure' type='quantitative' />
+      <column caption='SD (infection data.csv2)' datatype='integer' name='[SD (infection_data.csv2)]' role='measure' type='quantitative' />
+      <_.fcp.ObjectModelTableType.true...column caption='infection_data low' datatype='table' name='[__tableau_internal_object_id__].[infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C]' role='measure' type='quantitative' />
+      <column caption='not SD (infection data.csv1)' datatype='integer' name='[not SD (infection_data.csv1)]' role='measure' type='quantitative' />
+      <column caption='not SD (infection data.csv2)' datatype='integer' name='[not SD (infection_data.csv2)]' role='measure' type='quantitative' />
+      <column caption='Timestep (Infection Data.Csv1)' datatype='integer' name='[timestep (infection_data.csv1)]' role='measure' type='quantitative' />
+      <column caption='Timestep (Infection Data.Csv2)' datatype='integer' name='[timestep (infection_data.csv2)]' role='measure' type='quantitative' />
+      <column caption='Timestep' datatype='integer' name='[timestep]' role='measure' type='quantitative' />
+      <column caption='total - unsafe' datatype='integer' name='[total (infection_data.csv1)]' role='measure' type='quantitative' />
+      <column caption='total - safe' datatype='integer' name='[total (infection_data.csv2)]' role='measure' type='quantitative' />
+      <column caption='total - very unsafe' datatype='integer' name='[total]' role='measure' type='quantitative' />
+      <column-instance column='[total (infection_data.csv1)]' derivation='Sum' name='[sum:total (infection_data.csv1):qk]' pivot='key' type='quantitative' />
+      <column-instance column='[total (infection_data.csv2)]' derivation='Sum' name='[sum:total (infection_data.csv2):qk]' pivot='key' type='quantitative' />
+      <column-instance column='[total]' derivation='Sum' name='[sum:total:qk]' pivot='key' type='quantitative' />
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <style>
+        <style-rule element='mark'>
+          <encoding attr='color' field='[:Measure Names]' type='palette'>
+            <map to='#59a14f'>
+              <bucket>&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total (infection_data.csv2):qk]&quot;</bucket>
+            </map>
+            <map to='#e15759'>
+              <bucket>&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total:qk]&quot;</bucket>
+            </map>
+            <map to='#f28e2b'>
+              <bucket>&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total (infection_data.csv1):qk]&quot;</bucket>
+            </map>
+          </encoding>
+        </style-rule>
+      </style>
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+        <objects>
+          <object caption='infection_data low' id='infection_data.csv_FC615FA9FA7C42FCAD6286C333136F3C'>
+            <properties context=''>
+              <relation join='inner' type='join'>
+                <clause type='join'>
+                  <expression op='='>
+                    <expression op='[infection_data.csv].[timestep]' />
+                    <expression op='[infection_data.csv2].[timestep]' />
+                  </expression>
+                </clause>
+                <relation join='inner' type='join'>
+                  <clause type='join'>
+                    <expression op='='>
+                      <expression op='[infection_data.csv].[timestep]' />
+                      <expression op='[infection_data.csv1].[timestep]' />
+                    </expression>
+                  </clause>
+                  <relation connection='textscan.12st0lv0jpogfe15fpexe1az7zzu' name='infection_data.csv' table='[infection_data#csv]' type='table'>
+                    <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                      <column datatype='integer' name='total' ordinal='0' />
+                      <column datatype='integer' name='SD' ordinal='1' />
+                      <column datatype='integer' name='not SD' ordinal='2' />
+                      <column datatype='integer' name='timestep' ordinal='3' />
+                    </columns>
+                  </relation>
+                  <relation connection='textscan.1mfs8u01l15umz0zponf30pnzd52' name='infection_data.csv1' table='[infection_data#csv]' type='table'>
+                    <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                      <column datatype='integer' name='total' ordinal='0' />
+                      <column datatype='integer' name='SD' ordinal='1' />
+                      <column datatype='integer' name='not SD' ordinal='2' />
+                      <column datatype='integer' name='timestep' ordinal='3' />
+                    </columns>
+                  </relation>
+                </relation>
+                <relation connection='textscan.0gc1amb1ukk8lb1g9plx91yx8jhr' name='infection_data.csv2' table='[infection_data#csv]' type='table'>
+                  <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                    <column datatype='integer' name='total' ordinal='0' />
+                    <column datatype='integer' name='SD' ordinal='1' />
+                    <column datatype='integer' name='not SD' ordinal='2' />
+                    <column datatype='integer' name='timestep' ordinal='3' />
+                  </columns>
+                </relation>
+              </relation>
+            </properties>
+          </object>
+        </objects>
+      </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Infections'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='infection_data.csv+ (Multiple Connections)' name='federated.15oxx2r02ykjar15vq0tx04qcf0p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.15oxx2r02ykjar15vq0tx04qcf0p'>
+            <column-instance column='[timestep]' derivation='Sum' name='[sum:timestep:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[total (infection_data.csv1)]' derivation='Sum' name='[sum:total (infection_data.csv1):qk]' pivot='key' type='quantitative' />
+            <column-instance column='[total (infection_data.csv2)]' derivation='Sum' name='[sum:total (infection_data.csv2):qk]' pivot='key' type='quantitative' />
+            <column-instance column='[total]' derivation='Sum' name='[sum:total:qk]' pivot='key' type='quantitative' />
+            <column caption='Timestep' datatype='integer' name='[timestep]' role='measure' type='quantitative' />
+            <column caption='total - unsafe' datatype='integer' name='[total (infection_data.csv1)]' role='measure' type='quantitative' />
+            <column caption='total - safe' datatype='integer' name='[total (infection_data.csv2)]' role='measure' type='quantitative' />
+            <column caption='total - very unsafe' datatype='integer' name='[total]' role='measure' type='quantitative' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]'>
+            <groupfilter function='union' user:op='manual'>
+              <groupfilter function='member' level='[:Measure Names]' member='&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total:qk]&quot;' />
+              <groupfilter function='member' level='[:Measure Names]' member='&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total (infection_data.csv1):qk]&quot;' />
+              <groupfilter function='member' level='[:Measure Names]' member='&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total (infection_data.csv2):qk]&quot;' />
+            </groupfilter>
+          </filter>
+          <slices>
+            <column>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]</column>
+          </slices>
+          <aggregation value='false' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <format attr='title' class='0' field='[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]' scope='rows' value='Infections' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-cull' value='true' />
+                <format attr='mark-labels-show' value='false' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</rows>
+        <cols>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</cols>
+        <mark-labels>
+          <mark-label id='0' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>28</value>
+                <value>&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total:qk]&quot;</value>
+                <value>169.0</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='1' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>14</value>
+                <value>&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total (infection_data.csv1):qk]&quot;</value>
+                <value>114.0</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='2' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>14</value>
+                <value>&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total (infection_data.csv2):qk]&quot;</value>
+                <value>67.0</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='3' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>50</value>
+                <value>&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total (infection_data.csv2):qk]&quot;</value>
+                <value>6.0</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='4' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>50</value>
+                <value>&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total:qk]&quot;</value>
+                <value>29.0</value>
+              </tuple>
+            </tuple-reference>
+            <label-position x='9' y='-18' />
+          </mark-label>
+          <mark-label id='5' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:timestep:qk]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]</field>
+                  <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>50</value>
+                <value>&quot;[federated.15oxx2r02ykjar15vq0tx04qcf0p].[sum:total (infection_data.csv1):qk]&quot;</value>
+                <value>30.0</value>
+              </tuple>
+            </tuple-reference>
+            <label-position x='19' y='11' />
+          </mark-label>
+        </mark-labels>
+      </table>
+      <simple-id uuid='{90098D55-E690-42BB-A377-3A05BD71E1C0}' />
+    </worksheet>
+  </worksheets>
+  <windows source-height='30'>
+    <window class='worksheet' maximized='true' name='Infections'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+            <card type='measures' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.15oxx2r02ykjar15vq0tx04qcf0p].[:Measure Names]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{EF96B8E3-6E3D-445D-82B4-91DE504040D9}' />
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='192' name='Infections' width='192'>
+      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
+    </thumbnail>
+  </thumbnails>
+</workbook>
