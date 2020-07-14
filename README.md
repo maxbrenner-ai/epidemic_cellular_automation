@@ -2,7 +2,7 @@
 The purpose of this repo is to simulate an epidemic with simple rules, specifically, COVID-19.
 In addition, there are two main policies in-effect or that have been in-effect in certain states across the U.S and other countries. These two policies are social distancing and wearing a mask. This simulation explores just how important these policies can be to decreasing the spread of a virus and specifically COVID-19. 
 
-Please read my medium article (currently being published) on this simulation and its results to get a better view of the simulation details as well as how effective different safety polcies are. 
+Please read my [medium article](https://towardsdatascience.com/simulating-covid-19-with-cellular-automata-aeb820910a9) on this simulation and its results to get a better view of the simulation details as well as how effective different safety polcies are. 
 
 ![simulation](assets/ca.gif)
 
