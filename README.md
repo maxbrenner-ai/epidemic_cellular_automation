@@ -2,7 +2,7 @@
 The purpose of this repo is to simulate an epidemic with simple rules, specifically, COVID-19.
 In addition, there are two main policies in-effect or that have been in-effect in certain states across the U.S and other countries. These two policies are social distancing and wearing a mask. This simulation explores just how important these policies can be to decreasing the spread of a virus and specifically COVID-19. 
 
-Please read my medium article on this simulation and its results to get a better view of the simulation details as well as how effective different safety polcies are. 
+Please read my medium article (currently being published) on this simulation and its results to get a better view of the simulation details as well as how effective different safety polcies are. 
 
 # The Simulation
 It consists of a grid which represents the world. People populate the world which can have varying attributes such as whether they social distance, wear a mask, move a lot or are altruistic.
