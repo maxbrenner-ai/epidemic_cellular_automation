@@ -4,6 +4,8 @@ In addition, there are two main policies in-effect or that have been in-effect i
 
 Please read my medium article (currently being published) on this simulation and its results to get a better view of the simulation details as well as how effective different safety polcies are. 
 
+![simulation](assets/ca.gif)
+
 # The Simulation
 It consists of a grid which represents the world. People populate the world which can have varying attributes such as whether they social distance, wear a mask, move a lot or are altruistic.
 People who wear a mask have a lower probability of infecting another (like in reality). People who socially distance try to stay at least one cell away from all other people.
