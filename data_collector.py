@@ -17,6 +17,10 @@ advanced_equations = ['SAR', 'R0', 'R0S']
 
 class DataCollector:
     def __init__(self, constants, save_experiment, print_visualizations):
+        self.current_infected = 0
+        self.total_dead = 0
+        self.total_recovered = 0
+        self.percentage_inf = []
         self.constants = constants
         self.save_experiment = save_experiment
         self.print_visualizations = print_visualizations
@@ -26,8 +30,8 @@ class DataCollector:
         self._reset_data_options(hist=True)
         # Advanced Infection data collection
         # WM, SD, both, neither, total
-        self.adv_infection_data = {'total': 0, 'SD': 0, 'not SD': 0}
-        self.adv_infection_data_history = OrderedDict({'total': [], 'SD': [], 'not SD': []})
+        self.adv_infection_data = {'total': 0, 'SD': 0, 'not SD': 0, 'R': 0}
+        self.adv_infection_data_history = OrderedDict({'total': [], 'SD': [], 'not SD': [], 'R': []})
         # For adv equations
         # For SAR (Secondary Attack Rate) need total number of infected overtime
         self.total_infected = 0
@@ -59,16 +63,20 @@ class DataCollector:
         self.initial_S += 1
 
     def _update_adv_infection_data(self, person):
+        R = person.recovered
         SD = person.social_distance
         not_SD = not SD
-        self.adv_infection_data['total'] += 1
-        if SD: self.adv_infection_data['SD'] += 1
-        if not_SD: self.adv_infection_data['not SD'] += 1
+        if R: self.adv_infection_data['R'] += 1
+        else:
+            self.adv_infection_data['total'] += 1
+            if SD: self.adv_infection_data['SD'] += 1
+            if not_SD: self.adv_infection_data['not SD'] += 1
+
 
     def update_data(self, person):
         self.current_data['S'] += person.susceptible
         self.current_data['I'] += person.infected
-        if person.infected:
+        if person.infected or person.recovered:
             self._update_adv_infection_data(person)
         self.current_data['R'] += person.recovered
         self.current_data['WM'] += person.wear_mask
@@ -79,6 +87,7 @@ class DataCollector:
             self.current_data['severe'] += 1
         elif person.current_symptom_stage == 'asymptomatic':
             self.current_data['asymptomatic'] += 1
+
 
     def increment_death_data(self, person):
         self.current_data['death'] += 1
@@ -133,10 +142,14 @@ class DataCollector:
                     if 'R0S' in self.adv_to_print and total_bin_avg != None:
                         st += '\nR0S: {:.02f} x {} = {:.02f}'.format(total_bin_avg, self.current_data['S'], total_bin_avg * self.current_data['S'])
             print(st)
+        #save number of recovered
+        self.total_dead += self.current_data['death']
+        self.total_recovered = self.current_data['R']
+        self.current_infected = self.current_data['I']
         # Reset data
         self._reset_data_options()
         # If last print advanced equations
-        if last:
+        if last or self.current_infected == 0:
             SAR = self.total_infected / self.initial_S
             if 'SAR' in self.adv_to_print:
                 print('Secondary Attack Rate (SAR): {} / {} = {:.02f}'.format(self.total_infected, self.initial_S, SAR))
@@ -154,14 +167,24 @@ class DataCollector:
                     self.R0_hist[k].append(R0)
                     self.R0S_hist[k].append(R0S)
             # Visualizations
-            fig, axs = plt.subplots(2, 2, figsize=(15, 10))
+            fig, axs = plt.subplots(2, 2, squeeze=True, figsize=(15, 10))
             # Infections
             I_xvals = list(range(len(self.adv_infection_data_history['total'])))
             axs[0, 0].plot(I_xvals, self.adv_infection_data_history['total'], 'C0', label='total')
             axs[0, 0].plot(I_xvals, self.adv_infection_data_history['SD'], 'C2', label='SD')
             axs[0, 0].plot(I_xvals, self.adv_infection_data_history['not SD'], 'C3', label='not SD')
-            axs[0, 0].set_title('Infections based on SD')
+            #axs[0, 0].plot(I_xvals, self.adv_infection_data_history['R'], 'C5', label='recovered')
+            axs[0, 0].set_title('Infections at timestep based on SD')
             axs[0, 0].legend(loc="upper left")
+
+            # percentage
+            self.population = self.constants['grid'].get('initial_pop_size')
+            for value in self.adv_infection_data_history['R']:
+                self.percentage_inf.append((100.0/self.population)*value)
+            self.percentage = (100.0/self.population)*self.total_recovered
+            axs[0, 1].plot(I_xvals, self.percentage_inf, label='%1.3f %% recovered' % self.percentage)
+            axs[0, 1].set_title('Percentage of recovered people vs initial population. %i people died. (%1.3f %% of initial pop.)' %(self.total_dead,(100/self.population)*self.total_dead))
+            axs[0, 1].legend(loc="upper center")
 
             # R0
             R0_xvals = self.R0_xvals
