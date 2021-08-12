@@ -3,7 +3,7 @@
     "width": 120,
     "height": 120,
     "initial_pop_size": 4000,
-    "number_iterations": 5000
+    "number_iterations": 5000 
   },
   "render": {
     "cell_size": 6,
