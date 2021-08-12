@@ -18,10 +18,10 @@
     "move_length": 6,
     "initial_infection_prob": 0.0005,
     "altruistic_prob": 0.0,
-    "policy_type": "high"
+    "policy_type": "low"
   },
   "_comment": {
-    "policy_type": "Options for policy_type",
+    "policy_type": "    Options for policy_type are:    (Change in main.py!)     ",
     "very high": {"social_distance_prob": "0.98", "wear_mask_prob": "0.98"},
     "high": {"social_distance_prob": "0.85", "wear_mask_prob": "0.85"},
     "medium": {"social_distance_prob": "0.7", "wear_mask_prob": "0.7"},
