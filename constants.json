@@ -16,7 +16,7 @@
     "movement_prob": 0.50,
     "altruistic_movement_prob": 0.0,
     "move_length": 6,
-    "initial_infection_prob": 0.0005,
+    "initial_infection_prob": 0.00065,
     "altruistic_prob": 0.0,
     "policy_type": "low"
   },
