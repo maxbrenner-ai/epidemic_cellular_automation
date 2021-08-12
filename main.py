@@ -7,16 +7,16 @@ import json
 
 
 # Different color models (only one right now)
-color_models = {'SIR': {'susceptible': (204, 255, 204), 'infected': (255, 204, 204), 'recovered': (204, 204, 255)}}
+color_models = {'SIR': {'susceptible': (100, 255, 100), 'infected': (255, 100, 100), 'recovered': (100, 100, 255)}}
 # Different shape models (if you care about SD or WM more)
 shape_models = {'SD': {True: 'circle', False: 'rect'},
                 'WM': {True: 'circle', False: 'rect'}}
 # Policies that define overall safety level of the population
 policies_safety = {
-    'very high': {'social_distance_prob': 0.75, 'wear_mask_prob': 0.75},
-    'high': {'social_distance_prob': 0.5, 'wear_mask_prob': 0.5},
-    'medium': {'social_distance_prob': 0.25, 'wear_mask_prob': 0.25},
-    'low': {'social_distance_prob': 0.10, 'wear_mask_prob': 0.10},
+    'very high': {'social_distance_prob': 0.98, 'wear_mask_prob': 0.98},
+    'high': {'social_distance_prob': 0.85, 'wear_mask_prob': 0.85},
+    'medium': {'social_distance_prob': 0.7, 'wear_mask_prob': 0.7},
+    'low': {'social_distance_prob': 0.50, 'wear_mask_prob': 0.50},
 }
 
 
@@ -36,7 +36,7 @@ class CellularAutomation:
         # id (int): person (object)
         self.id_person = {}
         # Grid stores the person IDs in a 2D structure
-        self.grid = np.empty(shape=(self.grid_C['height'], self.grid_C['width']), dtype=np.object)
+        self.grid = np.empty(shape=(self.grid_C['height'], self.grid_C['width']), dtype=object)
         self.next_id = 0
         # The currently open positions (no person on it)
         self.open_positions = []
@@ -293,9 +293,9 @@ class CellularAutomation:
             pygame.display.set_caption("Population Dynamics")
             clock = pygame.time.Clock()
             # Initially set the screen to all black
-            screen.fill((0, 0, 0))
+            screen.fill((20, 20, 20))
         for t in range(self.grid_C['number_iterations']):
-            self.data_collect.reset(t)
+            self.data_collect.reset(t) #-------------------------------------------------------------------
             def loop_through_ids(ids):
                 # Keep track of any switches between SD lists
                 new_SD_list = []
@@ -330,7 +330,7 @@ class CellularAutomation:
                 self.ids_not_social_distance.add(id)
             if render:
                 pygame.display.flip()
-                screen.fill((0, 0, 0))
+                screen.fill((20, 20, 20))
                 # Frames per second
                 if self.render_C['fps']: clock.tick(self.render_C['fps'])
         self.data_collect.reset(t+1, last=True)
@@ -344,4 +344,5 @@ if __name__ == '__main__':
     data_collect.set_print_options(basic_to_print=['S', 'I', 'R', 'death'], frequency=1)
     CA = CellularAutomation(constants, data_collect)
     # Can render each timestep with pygame
+    print("Running...")
     CA.run(render=True)
