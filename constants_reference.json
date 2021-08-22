@@ -22,14 +22,14 @@
   },
   "disease": {
     "base_infection_prob": "The base infection probability of one infectious person",
-    "mask_infection_prob_decrease": "The decrease in 'base_infection_prob' if the infectious person is wearing a mask",
-    "total_length_infection": "Total length in days (usually) of the infection in a person (REF 3)",
-    "incubation_period_duration_range": "Range of possible number of incubation days (REF 3)",
-    "infectious_period_duration_range": "Range of possible number of infectious days (REF 3)",
-    "infectious_start_before_symptoms_range": "Range of possible number of days the infectious stage starts before symptoms start (REF 3)",
-    "severity_prob": "The probability of severe symptoms (given not asymptomatic) (REF 8)",
+    "mask_infection_prob_decrease": "The decrease in 'base_infection_prob' if the infectious person is wearing a mask. If 'base_infection_prob' = 0.4, try '0.362' for N95/surgical masks, and '0.315' for cloth masks. See the calculator for more infos.",
+    "total_length_infection": "Total length in days (usually) of the infection in a person (REF 3). Value is maximum for 'incubation_period_duration_range' + 'infectious_period_duration_range' + 'infectious_start_before_symptoms_range'",
+    "incubation_period_duration_range": "Range of possible number of incubation days (REF 3). Chosen randomly from inside the range.",
+    "infectious_period_duration_range": "Range of possible number of infectious days (REF 3). Chosen randomly from inside the range",
+    "infectious_start_before_symptoms_range": "Range of possible number of days the infectious stage starts before symptoms start (REF 3). Chosen randomly from inside the range",
+    "severity_prob": "The probability of severe symptoms (given not asymptomatic) (REF 8). Choose value between 0.0 and 1.0",
     "severe_symptoms_start_range": "The range of possible number of days that severe symptoms begin after mild symptoms starting",
-    "death_prob": "The probability of death occurring (given severe symptoms, hence why its high-ish) (REF 8)",
+    "death_prob": "The probability of death occurring (given severe symptoms, hence why its high-ish) (REF 8). Choose value between 0.0 and 1.0",
     "death_occurrence_range": "The range of possible number of days that death occurs after severe symptoms begin",
     "asymptomatic_prob": "The probability of being asymptomatic (no symptoms but still infectious) (REF 1)"
   }

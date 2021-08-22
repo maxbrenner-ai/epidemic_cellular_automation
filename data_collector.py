@@ -1,5 +1,4 @@
 from collections import OrderedDict
-import numpy as np
 import matplotlib.pyplot as plt
 import os
 from datetime import datetime
@@ -14,13 +13,31 @@ data_options = ['S', 'I', 'R', 'WM', 'SD', 'death', 'mild', 'severe', 'asymptoma
 # R0S -> R0 x S -> If > 1 then can multiply, = 1 then can become endemic (persistent but tame), < 1 then can die off
 advanced_equations = ['SAR', 'R0', 'R0S']
 
+# Plot figure size. Width, height in inches??
+size = (16, 10)
+# Background color. Possible color: https://matplotlib.org/stable/gallery/color/named_colors.html
+plt.rcParams['figure.facecolor'] = 'silver'
+plt.rcParams['savefig.facecolor'] = 'silver'
+# Frame color
+plt.rcParams['axes.facecolor'] = 'lightgrey'
+# Draw frame or not
+plot_frame = True
+# Tight layout
+tight = True
+
 
 class DataCollector:
     def __init__(self, constants, save_experiment, print_visualizations):
+        self.current_deaths = []
         self.current_infected = 0
-        self.total_dead = 0
+        self.percent_deaths = 0.0
+        self.percent_rec = 0.0
+        self.current_deaths_percent = []
+        self.current_recovered_percent = []
+        self.current_infected_percent = []
+        self.total_deaths = 0
         self.total_recovered = 0
-        self.percentage_inf = []
+        self.population = 0
         self.constants = constants
         self.save_experiment = save_experiment
         self.print_visualizations = print_visualizations
@@ -63,21 +80,23 @@ class DataCollector:
         self.initial_S += 1
 
     def _update_adv_infection_data(self, person):
-        R = person.recovered
         SD = person.social_distance
         not_SD = not SD
-        if R: self.adv_infection_data['R'] += 1
-        else:
-            self.adv_infection_data['total'] += 1
-            if SD: self.adv_infection_data['SD'] += 1
-            if not_SD: self.adv_infection_data['not SD'] += 1
+        self.adv_infection_data['total'] += 1
+        if SD: self.adv_infection_data['SD'] += 1
+        if not_SD: self.adv_infection_data['not SD'] += 1
 
+    def _update_adv_infection_data_rec(self, person):
+        R = person.recovered
+        if R: self.adv_infection_data['R'] += 1
 
     def update_data(self, person):
         self.current_data['S'] += person.susceptible
         self.current_data['I'] += person.infected
-        if person.infected or person.recovered:
+        if person.infected:
             self._update_adv_infection_data(person)
+        if person.recovered:
+            self._update_adv_infection_data_rec(person)
         self.current_data['R'] += person.recovered
         self.current_data['WM'] += person.wear_mask
         self.current_data['SD'] += person.social_distance
@@ -87,7 +106,6 @@ class DataCollector:
             self.current_data['severe'] += 1
         elif person.current_symptom_stage == 'asymptomatic':
             self.current_data['asymptomatic'] += 1
-
 
     def increment_death_data(self, person):
         self.current_data['death'] += 1
@@ -111,7 +129,7 @@ class DataCollector:
         # If bin is done in lifetime infected get avg and empty bin
         if timestep % self.lifetime_infected_bin_size == 0 and timestep != 0:
             self.lifetime_infected_bin_avgs[timestep] = {}
-            # If no one infected recovered/died them move on
+            # If no one infected recovered/died then move on
             if len(self.current_bin_lifetime_infected) == 0:
                 # Set to the last avgs initially and if new ones then set them
                 for k, last_avg in list(self.last_bin_avgs.items()):
@@ -126,26 +144,28 @@ class DataCollector:
                     self.lifetime_infected_bin_avgs[timestep][k] = bin_avg
                     self.last_bin_avgs[k] = bin_avg
             self.current_bin_lifetime_infected = []
-        # Print
-        if timestep % self.frequency_print == 0 and (self.basic_to_print or self.adv_to_print):
-            st = 'At timestep: {} --- '.format(timestep)
-            if self.basic_to_print:
-                for i, val in enumerate(self.basic_to_print):
-                    st += '{}: {}'.format(val, self.current_data[val])
-                    if i != len(self.basic_to_print)-1:
-                        st += ' --- '
-            if self.adv_to_print:
-                if timestep in self.lifetime_infected_bin_avgs:
-                    total_bin_avg = self.lifetime_infected_bin_avgs[timestep]['total']
-                    if 'R0' in self.adv_to_print and total_bin_avg != None:
-                        st += '\nBasic Reproduction Number (R0): {:.02f}'.format(total_bin_avg)
-                    if 'R0S' in self.adv_to_print and total_bin_avg != None:
-                        st += '\nR0S: {:.02f} x {} = {:.02f}'.format(total_bin_avg, self.current_data['S'], total_bin_avg * self.current_data['S'])
-            print(st)
-        #save number of recovered
-        self.total_dead += self.current_data['death']
-        self.total_recovered = self.current_data['R']
-        self.current_infected = self.current_data['I']
+        # Print if frequency > 0
+        if self.frequency_print > 0:
+            if timestep % self.frequency_print == 0 and (self.basic_to_print or self.adv_to_print):
+                st = 'At timestep: {} --- '.format(timestep)
+                if self.basic_to_print:
+                    for i, val in enumerate(self.basic_to_print):
+                        st += '{}: {}'.format(val, self.current_data[val])
+                        if i != len(self.basic_to_print) - 1:
+                            st += ' --- '
+                if self.adv_to_print:
+                    if timestep in self.lifetime_infected_bin_avgs:
+                        total_bin_avg = self.lifetime_infected_bin_avgs[timestep]['total']
+                        if 'R0' in self.adv_to_print and total_bin_avg is not None:
+                            st += '\nBasic Reproduction Number (R0): {:.02f}'.format(total_bin_avg)
+                        if 'R0S' in self.adv_to_print and total_bin_avg is not None:
+                            st += '\nR0S: {:.02f} x {} = {:.02f}'.format(total_bin_avg, self.current_data['S'], total_bin_avg * self.current_data['S'])
+                print(st)
+        # Save some stats for "if last is True"
+        self.total_deaths += self.current_data['death']
+        self.current_deaths.append(self.total_deaths)
+        self.total_recovered = self.current_data['R']  # current_data 'R' is always current total
+        self.current_infected = self.current_data['I']  # for check if no infected then stop calculation in 173
         # Reset data
         self._reset_data_options()
         # If last print advanced equations
@@ -161,30 +181,39 @@ class DataCollector:
                 self.R0_xvals.append(x_val)
                 S = self.data_history['S'][x_val]
                 for k, y_val in list(info.items()):
-                    if not y_val: y_val = np.nan
+                    if not y_val: y_val = 0.0  # Why use 'np.nan'? It produces ugly spaces in the line graph and is the only reason for numpy import
                     R0 = y_val
                     R0S = S * y_val
                     self.R0_hist[k].append(R0)
                     self.R0S_hist[k].append(R0S)
+
             # Visualizations
-            fig, axs = plt.subplots(2, 2, squeeze=True, figsize=(15, 10))
+            fig, axs = plt.subplots(2, 2, figsize=size, frameon=plot_frame, tight_layout=tight)
             # Infections
             I_xvals = list(range(len(self.adv_infection_data_history['total'])))
             axs[0, 0].plot(I_xvals, self.adv_infection_data_history['total'], 'C0', label='total')
             axs[0, 0].plot(I_xvals, self.adv_infection_data_history['SD'], 'C2', label='SD')
             axs[0, 0].plot(I_xvals, self.adv_infection_data_history['not SD'], 'C3', label='not SD')
-            #axs[0, 0].plot(I_xvals, self.adv_infection_data_history['R'], 'C5', label='recovered')
-            axs[0, 0].set_title('Infections at timestep based on SD')
+            axs[0, 0].set_ylabel('# people')
+            axs[0, 0].set_title('Infections at time step based on SD')
             axs[0, 0].legend(loc="upper left")
 
-            # percentage
+            # percent of once infected - of population. Also mentions deaths, but doesn't calc with
             self.population = self.constants['grid'].get('initial_pop_size')
             for value in self.adv_infection_data_history['R']:
-                self.percentage_inf.append((100.0/self.population)*value)
-            self.percentage = (100.0/self.population)*self.total_recovered
-            axs[0, 1].plot(I_xvals, self.percentage_inf, label='%1.3f %% recovered' % self.percentage)
-            axs[0, 1].set_title('Percentage of recovered people vs initial population. %i people died. (%1.3f %% of initial pop.)' %(self.total_dead,(100/self.population)*self.total_dead))
-            axs[0, 1].legend(loc="upper center")
+                self.current_recovered_percent.append((100.0 / self.population) * value)
+            for value in self.adv_infection_data_history['total']:
+                self.current_infected_percent.append((100.0 / self.population) * value)
+            for value in self.current_deaths:
+                self.current_deaths_percent.append((100.0 / self.population) * value)
+            self.percent_rec = (100.0 / self.population) * self.total_recovered
+            self.percent_deaths = (100.0 / self.population) * self.total_deaths
+            axs[0, 1].plot(I_xvals, self.current_recovered_percent, label='Percent had virus and recovered (%1.3f %%, %i final)' % (self.percent_rec, self.total_recovered))
+            axs[0, 1].plot(I_xvals, self.current_infected_percent, label='Percent infected at time step')
+            axs[0, 1].plot(I_xvals, self.current_deaths_percent, 'C3', label='Percent had virus and died (%1.3f %% final)' % self.percent_deaths)
+            axs[0, 1].set_ylabel('percent')
+            axs[0, 1].set_title('Percentages of initial population of %i. Total deaths = %i ' % (self.population, self.total_deaths))
+            axs[0, 1].legend(loc="upper left")
 
             # R0
             R0_xvals = self.R0_xvals
@@ -195,6 +224,8 @@ class DataCollector:
             axs[1, 0].plot(R0_xvals, self.R0_hist['not WM'], 'C1', label='not WM')
             axs[1, 0].plot(R0_xvals, self.R0_hist['both'], 'C5', label='both')
             axs[1, 0].plot(R0_xvals, self.R0_hist['neither'], 'C6', label='neither')
+            axs[1, 0].set_ylabel('R0')
+            axs[1, 0].set_xlabel('time step')
             axs[1, 0].set_title('R0 based on SD and WM')
             axs[1, 0].legend(loc="upper left")
 
@@ -206,6 +237,8 @@ class DataCollector:
             axs[1, 1].plot(R0_xvals, self.R0S_hist['not WM'], 'C1', label='not WM')
             axs[1, 1].plot(R0_xvals, self.R0S_hist['both'], 'C5', label='both')
             axs[1, 1].plot(R0_xvals, self.R0S_hist['neither'], 'C6', label='neither')
+            axs[1, 1].set_ylabel('R0S')
+            axs[1, 1].set_xlabel('time step')
             axs[1, 1].set_title('R0S based on SD and WM')
             axs[1, 1].legend(loc="upper left")
 
@@ -222,7 +255,7 @@ class DataCollector:
                 json.dump(self.constants, open(constants_file, 'w'), indent=4)
                 # Save visualizations
                 figure_file = os.path.join(sub_dir, 'plots.png')
-                plt.savefig(figure_file)
+                plt.savefig(figure_file)  # transparent=True
                 # Save data as .csv and txt
                 # Basic
                 basic_data_file = os.path.join(sub_dir, 'basic_data.csv')
@@ -251,3 +284,5 @@ class DataCollector:
 
             if self.print_visualizations:
                 plt.show()
+
+            quit()  # Because it would throw unessecary error due to "or self.current_infected is 0" (line 173), and I just couldn't figure out why it's being run again after first "last=True"

@@ -21,7 +21,7 @@
         "move_length": 6,
         "initial_infection_prob": 0.005,
         "altruistic_prob": 0.75,
-        "policy_type": "low"
+        "policy_type": "very high"
     },
     "disease": {
         "base_infection_prob": 0.4,
