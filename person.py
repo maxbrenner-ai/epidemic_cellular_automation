@@ -9,12 +9,33 @@ Notes:
     - It also says whether someone will intentionally move at a low rate
 - People who experience severe symptoms will automatically wear masks and social distance and no longer intentionally move
   but just move defensively
+
+Addendum by LtqxWYEG:
+- The Delta variant is about 2x as contagious as previous variants. Therefore increased default of base_infection_prob from .2 to .4
+        Source: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/986564/S1236_Eighty-nineth_SAGE_meeting.pdf
+- Delta variant causes more severe illness than previous strains. Therefore increased severe cases (ICU)
+    by a factor of 1.86. (Death_prop is probably high enough with increased severity_prob)
+        Source: https://www.medrxiv.org/content/10.1101/2021.07.05.21260050v3.full-text#T2
+        - While that study showes that death rates are about 1.51 times higher with the delta variant, some anecdotal
+          reports from 11 days ago, at time of writing, suggest a fatality rate of less than 50% after
+          admission to the ICU. Therefore I suggest to keep the death_prob at 0.49 for now.
+              Source: https://www.wbrc.com/2021/08/12/more-recoveries-than-deaths-with-delta-variant/
+- Mask effectiveness seemed very low. I raised the default value of 'mask_infection_prob_decrease' to 0.362, so that
+    the effectiveness reaches a range of 72.895% to 90.5%. That seems accurate for N95/surgical masks worn by the layman.
+    For simulating cloths masks I assume a value of 0.315 to be a good compromise,
+    which results in a efficiancy range of 48.264% to 78.75%.
+    ---For more information straight from the source, see the mask efficiency calculator.---
+        Source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8084286/
+- Default value of 'initial_infection_prob' seemed too high.
+    Lowering it so that around 10 infected are spawned, seems better for simulation purposes, imo.
 '''
+
+
 class Person:
     def __init__(self, position, age, social_distance, wear_mask, movement_prob, low_movement_prob, altruistic_prob, infected,
                  total_length_infection, incubation_period_duration_range, infectious_start_before_symptoms_range,
                  infectious_period_duration_range, severe_symptoms_start_range, fatality_occur_range,
-                 asymptomatic_prob, severe_prob, fatality_prob):
+                 asymptomatic_prob, severe_prob, fatality_prob):  # Note: fatality_prob is death_prob, severe_prob is severity_prob
         self.set_position(position)
         self.age = age
         self.social_distance = social_distance
