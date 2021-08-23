@@ -40,3 +40,5 @@ while infectious_neighbors <= infectious_neighbors_max:
     if infectious_neighbors == 1 or infectious_neighbors == 8:
         print("- %1.5f%% with %i infectious neighbors." % (mask_effectiveness, infectious_neighbors))
     infectious_neighbors = infectious_neighbors + 1
+
+input()
