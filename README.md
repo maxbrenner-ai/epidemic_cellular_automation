@@ -26,6 +26,6 @@ recent sources. However, some values I could not find and had to estimate for wh
 
 ## Running it
 Run `main.py` to run the simulation. It uses the constants defined in `constants.py` (whose references can be found in `constants_reference.py`). You can also choose to
-render it or not with the render argument (`CA.run(render=True)`). In addition, data can print out such as number of infected or dead as the simulation runs (`DataCollector.set_print_options()`).
-Lastly, you can save experiments and show visualizations after the simulation finishes (`DataCollector(constants, save_experiment=True, print_visualizations=True)`).
+not render a real-time view with the render argument (`CA.run(render=False)`, at the end of main.py), which will speed-up the simulation significantly. In addition, data can print out such as number of infected or dead as the simulation runs (`DataCollector.set_print_options()`).
+Lastly, you can save experiments and show visualizations after the simulation finishes (`DataCollector(constants, save_experiment=True, print_visualizations=True)`, also at the end of main.py).
 Experiments are saved in `experiments/`, which saves data, plots and constants used.

@@ -1,27 +1,53 @@
 import numpy as np
+import pygame
 import random
 from person import Person
-import pygame
 from data_collector import DataCollector
 import json
+import time
 
 
 # Different color models (only one right now)
-color_models = {'SIR': {'susceptible': (204, 255, 204), 'infected': (255, 204, 204), 'recovered': (204, 204, 255)}}
+color_models = {'sir': {'susceptible': (0, 135, 0), 'infected': (255, 75, 75), 'recovered': (120, 120, 220)},
+                'owb': {'susceptible': (0, 130, 255), 'infected': (255, 150, 0), 'recovered': (100, 100, 100)}}
+# Background color
+background = (25, 25, 25)
 # Different shape models (if you care about SD or WM more)
-shape_models = {'SD': {True: 'circle', False: 'rect'},
-                'WM': {True: 'circle', False: 'rect'}}
-# Policies that define overall safety level of the population
-policies_safety = {
-    'very high': {'social_distance_prob': 0.75, 'wear_mask_prob': 0.75},
-    'high': {'social_distance_prob': 0.5, 'wear_mask_prob': 0.5},
-    'medium': {'social_distance_prob': 0.25, 'wear_mask_prob': 0.25},
-    'low': {'social_distance_prob': 0.10, 'wear_mask_prob': 0.10},
-}
+shape_models = {'sd': {True: 'rect', False: 'circle'},
+                'wm': {True: 'rect', False: 'circle'}}
+# Policies that define overall safety level of the population. SD lower than WM because efficacy is <100%, realistically
+# but also those not wearing a mask are keeping a distance - either by themselves or by proxy
+policies_safety = {'very high': {'social_distance_prob': 0.89, 'wear_mask_prob': 0.90},
+                   'high': {'social_distance_prob': 0.76, 'wear_mask_prob': 0.8},
+                   'medium': {'social_distance_prob': 0.65, 'wear_mask_prob': 0.70},
+                   'low': {'social_distance_prob': 0.45, 'wear_mask_prob': 0.45},
+                   'very low': {'social_distance_prob': 0.22, 'wear_mask_prob': 0.20}}
+''' # NOTE:
+- About the probability to wear a mask: A study of face masks performed by Goldman Sachs in June 2020 presents interesting data on
+    self-reported mask use in different countries, finding that the percentage of people who reported wearing face masks in public
+    is nearly 90% in East Asia, just below 70% in the United States and Germany, and less than 10% in Scandinavia.
+    Within the United States, it was found that mask usage was generally lowest in the South and highest in the Northeast,
+    with 80% of Massachusetts residents reporting “always” wearing a face mask in public, compared to just 40% of respondents in Arizona.
+        Source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8084286/
+'''
+
+# Frequency at which to print results of timestep to console
+freq = 1
+# Data options for print results. ('S', 'I', 'R', 'WM', 'SD', 'death', 'mild', 'severe', 'asymptomatic')
+data_options = ['S', 'I', 'R', 'asymptomatic', 'death']
+# Print time it took for a single time-step
+benchmark_timestep = False
+# Save the generated data in ".\experiments\%d-%m-%Y_%H-%M-%S"
+save_experiment = True
+# Show graphs at the end?
+print_visualizations = True
+# Renders pygame view of CA. "False" is much faster if all you care about are results
+render = True
 
 
 class CellularAutomation:
     def __init__(self, constants, data_collect):
+        self.start = 0
         self.grid_C = constants['grid']
         self.render_C = constants['render']
         self.person_C = constants['person']
@@ -36,7 +62,7 @@ class CellularAutomation:
         # id (int): person (object)
         self.id_person = {}
         # Grid stores the person IDs in a 2D structure
-        self.grid = np.empty(shape=(self.grid_C['height'], self.grid_C['width']), dtype=np.object)
+        self.grid = np.empty(shape=(self.grid_C['height'], self.grid_C['width']), dtype=object)
         self.next_id = 0
         # The currently open positions (no person on it)
         self.open_positions = []
@@ -54,7 +80,7 @@ class CellularAutomation:
     def _get_cell_pos(self, x, y):
         def corrected(val, max_val):
             if val < 0:
-                 return max_val + val
+                return max_val + val
             elif val >= max_val:
                 return max_val - val
             else:
@@ -103,16 +129,14 @@ class CellularAutomation:
     # Grid initialization ------
     def _create_person(self, position):
         assert self._is_empty(position=position)
-        age = np.random.randint(self.person_C['age_range'][0], self.person_C['age_range'][1]+1)
+        age = np.random.randint(self.person_C['age_range'][0], self.person_C['age_range'][1] + 1)
         policy = policies_safety[self.person_C['policy_type']]
         SD_prob = policy['social_distance_prob']
         SD = True if np.random.random() < SD_prob else False
         WM_prob = policy['wear_mask_prob']
         WM = True if np.random.random() < WM_prob else False
         infected = np.random.random() < self.person_C['initial_infection_prob']
-
         if not infected: self.data_collect.increment_initial_S()
-
         person = Person(position, age, SD, WM, self.person_C['movement_prob'], self.person_C['altruistic_movement_prob'],
                         self.person_C['altruistic_prob'], infected,
                         self.disease_C['total_length_infection'], self.disease_C['incubation_period_duration_range'],
@@ -149,13 +173,14 @@ class CellularAutomation:
             abs_y = y + rel_y
             correct_x, correct_y = self._get_cell_pos(abs_x, abs_y)
             located_id = self.grid[correct_y, correct_x]  # Might be None if no person there
-            if located_id == None:
+            if located_id is None:
                 yield None, (correct_x, correct_y), (rel_x, rel_y)
             else:
                 yield self.id_person[located_id], (correct_x, correct_y), (rel_x, rel_y)
 
     # This decides movement and num of infected neighbors FOR SD people
     def _check_neighbors_SD(self, id, person):
+
         def check_neighbors(last_position=None):
             safe_cells = {(-1, -1): None, (0, -1): None, (1, -1): None, (-1, 0): None, (1, 0): None, (-1, 1): None, (0, 1): None, (1, 1): None}
             infected_neighbors = []
@@ -206,6 +231,7 @@ class CellularAutomation:
 
     # If not SD then move if moving intentionally
     def _check_neighbors_not_SD(self, id, person):
+
         def check_neighbors(last_position=None):
             empty_spots = []
             infected_neighbors = []
@@ -251,15 +277,20 @@ class CellularAutomation:
         dead, new_SD = person.progress_infection(self.data_collect)
         if dead:
             self._kill_person(id, person.social_distance)
-            return None # Continue to next person
+            return None  # Continue to next person
         # At the start figure out where the person is going to move AND the number of infected persons around them
         self._check_neighbors_SD(id, person) if person.social_distance else self._check_neighbors_not_SD(id, person)
         return new_SD
 
     # For rendering
     def _get_person_color(self, person):
-        if self.render_C['color_model'] == 'SIR':
-            colors = color_models['SIR']
+        if self.render_C['color_model'] == 'sir':
+            colors = color_models['sir']
+            if person.susceptible: return colors['susceptible']
+            if person.infected: return colors['infected']
+            return colors['recovered']
+        else:
+            colors = color_models['owb']
             if person.susceptible: return colors['susceptible']
             if person.infected: return colors['infected']
             return colors['recovered']
@@ -267,7 +298,7 @@ class CellularAutomation:
     def _render(self, id, screen):
         person = self.id_person[id]
         shape_model = self.render_C['shape_model']
-        if shape_model == 'SD':
+        if shape_model == 'sd':
             shape = shape_models[shape_model][person.social_distance]
         else:
             shape = shape_models[shape_model][person.wear_mask]
@@ -293,9 +324,14 @@ class CellularAutomation:
             pygame.display.set_caption("Population Dynamics")
             clock = pygame.time.Clock()
             # Initially set the screen to all black
-            screen.fill((0, 0, 0))
+            screen.fill(background)
         for t in range(self.grid_C['number_iterations']):
             self.data_collect.reset(t)
+
+            if benchmark_timestep is True:
+                print(f"This timestep took {time.perf_counter() - self.start} seconds")
+                self.start = time.perf_counter()
+
             def loop_through_ids(ids):
                 # Keep track of any switches between SD lists
                 new_SD_list = []
@@ -330,18 +366,19 @@ class CellularAutomation:
                 self.ids_not_social_distance.add(id)
             if render:
                 pygame.display.flip()
-                screen.fill((0, 0, 0))
+                screen.fill(background)
                 # Frames per second
                 if self.render_C['fps']: clock.tick(self.render_C['fps'])
-        self.data_collect.reset(t+1, last=True)
+        self.data_collect.reset(t, last=True)
 
 
 if __name__ == '__main__':
     constants = json.load(open('constants.json'))
     # Can save a run as an experiment which saves the data, visualizations and constants in a experiments directory
-    data_collect = DataCollector(constants, save_experiment=True, print_visualizations=True)
+    data_collect = DataCollector(constants, save_experiment, print_visualizations)
     # Can print data (look at `data_options` at top of `data_collector.py` for options) and how often to print
-    data_collect.set_print_options(basic_to_print=['S', 'I', 'R', 'death'], frequency=1)
+    data_collect.set_print_options(basic_to_print=data_options, frequency=freq)
     CA = CellularAutomation(constants, data_collect)
     # Can render each timestep with pygame
-    CA.run(render=True)
+    if freq == 0: print('Running ...')
+    CA.run(render)
